@@ -96,17 +96,26 @@ body::before {
 .progress-info .label { color:var(--text-dim); }
 .progress-info .score { color:var(--accent); }
 
-/* Name input (ep1 only or if no stored name) */
+/* Name input */
 .name-gate {
   text-align:center; padding:40px 0;
   flex:1; display:flex; flex-direction:column;
   justify-content:center; align-items:center;
 }
 .name-gate h2 { font-size:1.3rem; margin-bottom:16px; }
-.name-gate .input-row {
-  display:flex; gap:12px; max-width:380px; width:100%;
+.name-gate .fields {
+  display:flex; flex-direction:column; gap:12px;
+  max-width:380px; width:100%;
 }
-.name-input {
+.name-gate .input-row {
+  display:flex; gap:12px; width:100%;
+}
+.field-label {
+  font-family:'Space Mono',monospace; font-size:.7rem;
+  color:var(--text-muted); letter-spacing:1px;
+  text-transform:uppercase; margin-bottom:4px; text-align:left;
+}
+.name-input,.code-input {
   flex:1; padding:14px 18px;
   background:var(--bg-card);
   border:2px solid var(--text-muted);
@@ -115,8 +124,18 @@ body::before {
   font-family:'Outfit',sans-serif; font-size:1rem;
   outline:none; transition:border-color .3s;
 }
-.name-input:focus { border-color:var(--accent); }
-.name-input::placeholder { color:var(--text-muted); }
+.code-input {
+  font-family:'Space Mono',monospace;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  max-width:140px;
+}
+.name-input:focus,.code-input:focus { border-color:var(--accent); }
+.name-input::placeholder,.code-input::placeholder { color:var(--text-muted); }
+.code-hint {
+  font-size:.75rem; color:var(--text-muted);
+  margin-top:2px; text-align:left; line-height:1.4;
+}
 
 .btn-go {
   padding:14px 28px;
@@ -383,15 +402,27 @@ body::before {
   </div>
 
   <!-- NAME GATE -->
-  <div class="screen " id="screenName">
+  <div class="screen active" id="screenName">
     <div class="name-gate">
-      <h2>👋 ¡Bienvenido/a de vuelta!</h2>
+      <h2>🛡️ Misión Anti-Ciberacoso</h2>
       <p style="color:var(--text-dim);margin-bottom:20px;max-width:420px;line-height:1.6">
-        Continúa con el episodio 4.
+        Vas a vivir situaciones reales de ciberacoso y tendrás que tomar decisiones. Tus elecciones importan.
       </p>
-      <div class="input-row">
-        <input class="name-input" id="nameInput" type="text" placeholder="Tu nombre..." maxlength="30" autocomplete="off">
-        <button class="btn-go" id="btnGo" disabled>Continuar</button>
+      <div class="fields">
+        <div>
+          <div class="field-label">Código de pareja</div>
+          <div class="input-row">
+            <input class="code-input" id="codeInput" type="text" placeholder="Ej: A3-07" maxlength="10" autocomplete="off">
+          </div>
+          <div class="code-hint">Inventad un código único para vuestra pareja. Usad el MISMO código en los 4 episodios.</div>
+        </div>
+        <div>
+          <div class="field-label">Nombres</div>
+          <div class="input-row">
+            <input class="name-input" id="nameInput" type="text" placeholder="Nombre 1 y Nombre 2" maxlength="50" autocomplete="off">
+            <button class="btn-go" id="btnGo" disabled>Continuar</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -446,53 +477,56 @@ const EP_NUM = 4;
 const scenarios = [{"title": "El vídeo que no para", "emoji": "🎬", "narrative": "Un vídeo humillante de una compañera de tu clase está circulando por todos los grupos. Ella <strong>no ha venido al instituto en tres días</strong>. Un profesor pregunta en clase si alguien sabe algo. Tú tienes el vídeo en tu móvil porque te lo pasaron, pero <strong>no quieres que nadie sepa que lo tienes</strong>.", "choices": [{"letter": "A", "text": "Levantas la mano y cuentas todo delante de la clase: quién lo grabó, quién lo pasó y que tú lo tienes.", "quality": "ok", "points": 1, "feedback": "Tu valentía es admirable, pero al contarlo delante de toda la clase estás exponiendo públicamente a la víctima y a ti mismo/a. Algunos compañeros implicados pueden reaccionar agresivamente ahí mismo.", "info_title": "El contexto importa", "info": "Denunciar es fundamental, pero <strong>cómo lo haces importa tanto como hacerlo</strong>. Hablar en público puede revictimizar a quien sufre el acoso y generar una reacción de grupo impredecible. La intervención de un adulto en un espacio <strong>privado y seguro</strong> es más efectiva."}, {"letter": "B", "text": "Después de clase, hablas con el profesor en privado. Le enseñas el vídeo como prueba y le cuentas lo que sabes.", "quality": "best", "points": 3, "feedback": "Perfecto. Actúas de forma discreta, aportas pruebas y permites que un adulto gestione la situación. Protege a la víctima y también te protege a ti.", "info_title": "Denunciar con inteligencia", "info": "<strong>Guardar las pruebas y entregarlas a un adulto de confianza en privado</strong> es el protocolo más efectivo. El profesor puede activar el protocolo de acoso del centro sin exponer a nadie. Recuerda: <strong>tú no tienes la culpa</strong> por tener el vídeo si no lo difundiste."}, {"letter": "C", "text": "Borras el vídeo de tu móvil y no dices nada. No quieres problemas y tú no lo grabaste.", "quality": "bad", "points": 0, "feedback": "Al borrar el vídeo destruyes una prueba que podría ayudar a tu compañera. Y al callar, la situación sigue sin resolverse. Ella lleva tres días sin venir al instituto.", "info_title": "Las pruebas salvan", "info": "<strong>Si te acosan o conoces un caso: guarda las pruebas.</strong> Capturas de pantalla, vídeos, mensajes con fecha y hora. Son fundamentales para que el centro educativo o las autoridades puedan actuar. Borrar evidencias protege al agresor, no a la víctima."}]}, {"title": "Tu primo pequeño", "emoji": "👦", "narrative": "Tu primo de 10 años te enseña orgulloso sus conversaciones con un <em>\"amigo nuevo\"</em> que conoció en un juego online. El \"amigo\" le <strong>pide que no le cuente a nadie que hablan</strong> y le ha preguntado en qué colegio estudia y a qué hora sale de clase. Tu primo dice que <em>\"es majo y le ayuda en el juego\"</em>.", "choices": [{"letter": "A", "text": "Le dices que tenga cuidado pero que seguramente sea otro niño jugando. No quieres asustarlo.", "quality": "bad", "points": 0, "feedback": "Un adulto que pide secretos a un menor y pregunta por su horario y ubicación muestra señales claras de peligro. Quitarle importancia pone en riesgo a tu primo.", "info_title": "Señales de alerta", "info": "Las señales de <strong>grooming</strong> son claras: un desconocido que <strong>pide mantener la relación en secreto</strong>, que pregunta por datos personales (colegio, horario, dirección) y que genera dependencia emocional. <strong>Cualquier adulto que pide a un menor guardar secretos es una señal de alarma.</strong>"}, {"letter": "B", "text": "Le dices a tu primo que bloquee inmediatamente a esa persona y no hable más con desconocidos.", "quality": "ok", "points": 1, "feedback": "Bloquear corta el contacto, pero no resuelve el problema: esa persona puede contactar a otros niños. Y sin guardar pruebas, no se puede denunciar ni investigar.", "info_title": "Bloquear no basta", "info": "Bloquear es un primer paso de protección, pero <strong>sin pruebas no hay denuncia posible</strong>. Además, el agresor sigue activo y puede buscar a otras víctimas. Para proteger de verdad, hay que <strong>guardar pruebas + informar a un adulto + denunciar si es necesario</strong>."}, {"letter": "C", "text": "Hablas inmediatamente con tus tíos, les enseñas las conversaciones y guardáis capturas antes de bloquear.", "quality": "best", "points": 3, "feedback": "Acción completa: involucras a los adultos responsables, conservas las pruebas (que pueden servir para una denuncia) y luego se bloquea al contacto. Podrías estar evitando algo muy grave.", "info_title": "Actúa con urgencia", "info": "<strong>Pide ayuda con urgencia si la amenaza es grave.</strong> Los padres/tutores pueden denunciar ante la Policía Nacional o Guardia Civil, que tienen unidades especializadas en delitos telemáticos contra menores. La <strong>línea IS4K (017)</strong> es gratuita y confidencial."}]}, {"title": "Las represalias", "emoji": "🔄", "narrative": "La semana pasada denunciaste un caso de ciberacoso al orientador del instituto. Funcionó: el acosador fue sancionado. Pero ahora <strong>él ha descubierto que fuiste tú</strong> y te está enviando mensajes amenazantes: <em>\"Te vas a enterar, chivato/a\"</em>. Algunos de sus amigos te miran mal en el pasillo.", "choices": [{"letter": "A", "text": "Le respondes que si no para, esta vez vas directo a la policía. Así ve que no te da miedo.", "quality": "ok", "points": 1, "feedback": "Advertirle no está mal, pero al responder estás dándole una reacción (que es lo que busca) y manteniendo un canal de comunicación. Además, las amenazas por escrito tuyas podrían ser sacadas de contexto.", "info_title": "No respondas a provocaciones", "info": "La primera regla: <strong>no contestes a las provocaciones</strong>. Al responder, aunque sea para defenderte, le das al agresor una reacción emocional que le da poder. Tus mensajes pueden ser <strong>manipulados o sacados de contexto</strong>. Deja que los adultos gestionen la comunicación."}, {"letter": "B", "text": "Ignoras los mensajes y aguantas. Ya pasará. No quieres ser \"el pesado\" que denuncia dos veces.", "quality": "bad", "points": 0, "feedback": "Aguantar en silencio es exactamente lo que el acosador espera. Las represalias por denunciar son un agravante serio y debes comunicarlo. No eres pesado/a: estás ejerciendo tu derecho.", "info_title": "Las represalias son un agravante", "info": "Las <strong>represalias contra quien denuncia</strong> son especialmente graves y los protocolos de los centros educativos las contemplan como un <strong>agravante de la sanción</strong>. No denunciar por miedo a \"ser pesado\" es exactamente lo que el agresor quiere conseguir."}, {"letter": "C", "text": "Guardas capturas de todos los mensajes amenazantes y vuelves a hablar con el orientador/a para informar de las represalias.", "quality": "best", "points": 3, "feedback": "Perfecto. Guardas pruebas y vuelves a activar el canal de ayuda. Las represalias son un problema nuevo que requiere una nueva intervención. No tienes que gestionarlo solo/a.", "info_title": "Denuncia las veces que haga falta", "info": "Si la situación se repite o aparecen represalias: <strong>vuelve a denunciar, siempre con pruebas</strong>. Los centros educativos, la <strong>línea IS4K (017)</strong>, la <strong>Policía Nacional</strong> y la <strong>Guardia Civil</strong> están para ayudarte. Más info en <strong>is4k.es</strong> y <strong>osi.es</strong>. <strong>¡Tolerancia cero al ciberacoso!</strong>"}]}];
 
 let playerName = "";
+let teamCode = "";
 let epScore = 0;
 let scenarioScores = [];
 let currentScenario = 0;
 
+function storageKey(suffix) { return "ciberacoso_" + teamCode.toUpperCase().trim() + "_" + suffix; }
+
 // ── INIT ──
 const nameInput = document.getElementById("nameInput");
+const codeInput = document.getElementById("codeInput");
 const btnGo = document.getElementById("btnGo");
 
-// Try to load from storage
+function checkReady() {
+  const hasCode = codeInput.value.trim().length >= 2;
+  const hasName = nameInput.value.trim().length >= 2;
+  btnGo.disabled = !(hasCode && hasName);
+}
+
+// Pre-fill from localStorage if available
 (function init() {
   try {
-    const stored = localStorage.getItem("ciberacoso_name");
-    if (stored && EP_NUM > 1) {
-      nameInput.value = stored;
-      btnGo.disabled = false;
-    }
+    const lastCode = localStorage.getItem("ciberacoso_lastcode");
+    const lastName = localStorage.getItem("ciberacoso_lastname");
+    if (lastCode) codeInput.value = lastCode;
+    if (lastName) nameInput.value = lastName;
+    checkReady();
   } catch(e) {}
 })();
 
-nameInput.addEventListener("input", () => {
-  btnGo.disabled = nameInput.value.trim().length < 2;
-});
+codeInput.addEventListener("input", checkReady);
+nameInput.addEventListener("input", checkReady);
 nameInput.addEventListener("keydown", e => {
+  if (e.key==="Enter" && !btnGo.disabled) startEpisode();
+});
+codeInput.addEventListener("keydown", e => {
   if (e.key==="Enter" && !btnGo.disabled) startEpisode();
 });
 btnGo.addEventListener("click", startEpisode);
 
 function startEpisode() {
   playerName = nameInput.value.trim();
+  teamCode = codeInput.value.trim().toUpperCase();
   try {
-    localStorage.setItem("ciberacoso_name", playerName);
+    localStorage.setItem("ciberacoso_lastcode", teamCode);
+    localStorage.setItem("ciberacoso_lastname", playerName);
   } catch(e) {}
   
   document.getElementById("screenName").classList.remove("active");
   document.getElementById("screenPlay").classList.add("active");
   renderScenario(0);
-}
-
-// If name already stored and ep > 1, auto-start
-if (EP_NUM > 1) {
-  try {
-    const stored = localStorage.getItem("ciberacoso_name");
-    if (stored) {
-      nameInput.value = stored;
-      btnGo.disabled = false;
-    }
-  } catch(e) {}
 }
 
 function renderScenario(idx) {
@@ -585,17 +619,16 @@ function showEpEnd() {
 
   // Save score
   try {
-    let allScores = JSON.parse(localStorage.getItem("ciberacoso_scores") || "[]");
-    // Replace or add this episode's data
+    let allScores = JSON.parse(localStorage.getItem(storageKey("scores")) || "[]");
     allScores = allScores.filter(s => s.ep !== EP_NUM);
     allScores.push({ ep: EP_NUM, score: epScore, scenarios: scenarioScores });
-    localStorage.setItem("ciberacoso_scores", JSON.stringify(allScores));
+    localStorage.setItem(storageKey("scores"), JSON.stringify(allScores));
   } catch(e) {}
 
   // Calculate cumulative
   let cumulative = epScore;
   try {
-    const allScores = JSON.parse(localStorage.getItem("ciberacoso_scores") || "[]");
+    const allScores = JSON.parse(localStorage.getItem(storageKey("scores")) || "[]");
     cumulative = allScores.reduce((sum, s) => sum + s.score, 0);
   } catch(e) {}
 
@@ -618,9 +651,13 @@ function showFinalResults() {
   let allScores = [];
   let totalScore = 0;
   try {
-    allScores = JSON.parse(localStorage.getItem("ciberacoso_scores") || "[]");
+    allScores = JSON.parse(localStorage.getItem(storageKey("scores")) || "[]");
     totalScore = allScores.reduce((sum, s) => sum + s.score, 0);
   } catch(e) { totalScore = epScore; }
+
+  // Check missing episodes
+  const completedEps = allScores.map(s => s.ep).sort();
+  const missingEps = [1,2,3,4].filter(e => !completedEps.includes(e));
 
   const ranks = [
     { min:30, icon:"🏆", title:"Experto/a en ciberseguridad", color:"var(--green)", bg:"rgba(0,230,118,.1)" },
@@ -640,8 +677,13 @@ function showFinalResults() {
   rt.style.background = rank.bg;
 
   // Build summary from all episodes
-  const epNames = ["¿Qué es el ciberacoso?", "Roles y tipos", "Prevención", "Actuación y denuncia"];
   let cardsHtml = "";
+  if (missingEps.length > 0) {
+    cardsHtml += `<div class="summary-card" style="border:1px solid rgba(255,145,0,.3)">
+      <span class="sc-n">⚠️</span>
+      <span class="sc-t" style="color:var(--orange)">Faltan episodios: ${missingEps.join(", ")} (no se encontraron datos con código ${teamCode})</span>
+    </div>`;
+  }
   allScores.sort((a,b) => a.ep - b.ep);
   allScores.forEach(epData => {
     epData.scenarios.forEach((s, i) => {
@@ -660,7 +702,7 @@ function showFinalResults() {
   const d = now.toLocaleDateString("es-ES") + " " + 
             now.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
   document.getElementById("playerStamp").textContent = 
-    `${playerName} · ${d} · ${totalScore}/36 pts`;
+    `Código: ${teamCode} · ${playerName} · ${d} · ${totalScore}/36 pts`;
 
   window.scrollTo({ top:0, behavior:"smooth" });
 }

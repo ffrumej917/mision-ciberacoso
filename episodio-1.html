@@ -96,17 +96,26 @@ body::before {
 .progress-info .label { color:var(--text-dim); }
 .progress-info .score { color:var(--accent); }
 
-/* Name input (ep1 only or if no stored name) */
+/* Name input */
 .name-gate {
   text-align:center; padding:40px 0;
   flex:1; display:flex; flex-direction:column;
   justify-content:center; align-items:center;
 }
 .name-gate h2 { font-size:1.3rem; margin-bottom:16px; }
-.name-gate .input-row {
-  display:flex; gap:12px; max-width:380px; width:100%;
+.name-gate .fields {
+  display:flex; flex-direction:column; gap:12px;
+  max-width:380px; width:100%;
 }
-.name-input {
+.name-gate .input-row {
+  display:flex; gap:12px; width:100%;
+}
+.field-label {
+  font-family:'Space Mono',monospace; font-size:.7rem;
+  color:var(--text-muted); letter-spacing:1px;
+  text-transform:uppercase; margin-bottom:4px; text-align:left;
+}
+.name-input,.code-input {
   flex:1; padding:14px 18px;
   background:var(--bg-card);
   border:2px solid var(--text-muted);
@@ -115,8 +124,18 @@ body::before {
   font-family:'Outfit',sans-serif; font-size:1rem;
   outline:none; transition:border-color .3s;
 }
-.name-input:focus { border-color:var(--accent); }
-.name-input::placeholder { color:var(--text-muted); }
+.code-input {
+  font-family:'Space Mono',monospace;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  max-width:140px;
+}
+.name-input:focus,.code-input:focus { border-color:var(--accent); }
+.name-input::placeholder,.code-input::placeholder { color:var(--text-muted); }
+.code-hint {
+  font-size:.75rem; color:var(--text-muted);
+  margin-top:2px; text-align:left; line-height:1.4;
+}
 
 .btn-go {
   padding:14px 28px;
@@ -389,9 +408,21 @@ body::before {
       <p style="color:var(--text-dim);margin-bottom:20px;max-width:420px;line-height:1.6">
         Vas a vivir situaciones reales de ciberacoso y tendrás que tomar decisiones. Tus elecciones importan.
       </p>
-      <div class="input-row">
-        <input class="name-input" id="nameInput" type="text" placeholder="Tu nombre..." maxlength="30" autocomplete="off">
-        <button class="btn-go" id="btnGo" disabled>Empezar</button>
+      <div class="fields">
+        <div>
+          <div class="field-label">Código de pareja</div>
+          <div class="input-row">
+            <input class="code-input" id="codeInput" type="text" placeholder="Ej: A3-07" maxlength="10" autocomplete="off">
+          </div>
+          <div class="code-hint">Inventad un código único para vuestra pareja. Usad el MISMO código en los 4 episodios.</div>
+        </div>
+        <div>
+          <div class="field-label">Nombres</div>
+          <div class="input-row">
+            <input class="name-input" id="nameInput" type="text" placeholder="Nombre 1 y Nombre 2" maxlength="50" autocomplete="off">
+            <button class="btn-go" id="btnGo" disabled>Empezar</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -419,53 +450,56 @@ const EP_NUM = 1;
 const scenarios = [{"title": "El meme de clase", "emoji": "😂", "narrative": "En educación física, un compañero se tropieza y cae de forma graciosa. Alguien lo graba y sube un <strong>meme con su cara al grupo de clase</strong>. Todo el mundo se ríe. El compañero también parece reírse… pero tú notas que <strong>su risa es forzada</strong> y que al salir de clase está callado.", "choices": [{"letter": "A", "text": "Le preguntas en privado si de verdad le ha parecido gracioso y si está bien.", "quality": "best", "points": 3, "feedback": "Excelente. Te fijaste en las señales. Muchas víctimas fingen que no les importa por miedo a que les llamen exagerados. Preguntar en privado le da espacio para ser sincero.", "info_title": "La víctima invisible", "info": "Una de las cosas más difíciles del ciberacoso es que <strong>la víctima a menudo finge que no le afecta</strong> para no quedar como \"blanda\". Por eso los observadores no detectan el problema. <strong>Fijarse en las señales no verbales</strong> (estar callado, alejarse, cambiar de humor) es clave."}, {"letter": "B", "text": "No le das like ni lo reenvías, pero tampoco dices nada. No quieres crear un drama por un meme.", "quality": "ok", "points": 1, "feedback": "Es mejor que participar, pero tu silencio puede ser interpretado como aprobación. Si todos \"pasan\" del tema, nadie ayuda a quien lo está pasando mal.", "info_title": "El peso del silencio", "info": "Los <strong>observadores pasivos</strong> forman la mayoría en cualquier caso de ciberacoso. No participan, pero su silencio <strong>normaliza la situación</strong>. Estudios muestran que cuando UN solo observador actúa, la probabilidad de que el acoso se detenga aumenta un 50%."}, {"letter": "C", "text": "Pones un \"😂\" en el grupo. Si él se ríe también, es que le parece bien.", "quality": "bad", "points": 0, "feedback": "Que alguien finja reírse no significa que le parezca bien. Tu \"😂\" refuerza al grupo y hace más difícil que la víctima se atreva a decir que le molesta. Estás contribuyendo al problema sin saberlo.", "info_title": "La viralidad empieza con un clic", "info": "Cada reacción (like, emoji, comentario) <strong>aumenta la visibilidad</strong> del contenido. Eso es la <strong>viralidad</strong>: un mensaje llega a cientos de personas en minutos y <strong>es imposible recuperar el control</strong>. Un meme \"gracioso\" hoy puede ser una pesadilla mañana."}]}, {"title": "El audio reenviado", "emoji": "🎤", "narrative": "Una amiga te envía un <strong>audio privado de otro compañero llorando</strong> mientras cuenta problemas personales de su familia. Tu amiga te dice: <em>\"Escúchalo, pobrecito, a ver cómo le ayudamos\"</em>. Parece que tiene buena intención.", "choices": [{"letter": "A", "text": "Lo escuchas para saber si necesita ayuda. Tu intención es buena.", "quality": "bad", "points": 0, "feedback": "Aunque tu intención sea buena, escuchar un audio privado que no iba dirigido a ti es una violación de su intimidad. Si te preocupa, pregúntale directamente a él si necesita algo.", "info_title": "Buenas intenciones, mala acción", "info": "El ciberacoso no siempre viene de la maldad. A veces <strong>difundimos contenido privado \"por preocupación\"</strong>, pero el resultado es el mismo: la intimidad de alguien queda expuesta sin su consentimiento. <strong>Piensa antes de escuchar o compartir</strong> cualquier contenido que no iba dirigido a ti."}, {"letter": "B", "text": "Le dices a tu amiga que no debería habértelo enviado, que borre ese audio y que no lo pase a nadie más.", "quality": "best", "points": 3, "feedback": "Perfecto. Cortas la cadena de difusión y le haces ver a tu amiga que, aunque su intención sea buena, compartir ese audio es una invasión de la privacidad del compañero.", "info_title": "Cortar la cadena", "info": "La <strong>conexión permanente</strong> (24h, 7 días) hace que el contenido privado se propague sin control. <strong>Cada persona que recibe y no actúa</strong> es un eslabón más en la cadena. Ser quien la corta requiere valentía, pero es la acción más efectiva."}, {"letter": "C", "text": "Lo escuchas, lo borras y no lo pasas a nadie. Así no haces daño.", "quality": "ok", "points": 1, "feedback": "No reenviarlo está bien, pero al escucharlo ya has participado en la invasión de su privacidad. Borrar tu copia no borra la de tu amiga ni la de otros que ya lo tengan.", "info_title": "Borrar no es deshacer", "info": "Una característica del ciberacoso es que <strong>lo digital es permanente</strong>. Borrar un mensaje de tu dispositivo no lo elimina de los demás. El daño ya está hecho en el momento en que el contenido privado sale del control de su dueño."}]}, {"title": "La encuesta anónima", "emoji": "📊", "narrative": "Alguien crea una <strong>encuesta anónima en Instagram Stories</strong>: <em>\"¿Quién es el/la más feo/a de la clase?\"</em>. Ya hay muchos votos y comentarios. Varios compañeros tuyos te dicen <em>\"mira qué fuerte, vota\"</em>. Tú no quieres votar, pero te pica la curiosidad de ver los resultados.", "choices": [{"letter": "A", "text": "Escribes en la caja de preguntas de la Story que eso es acoso y que deberían pararlo.", "quality": "ok", "points": 1, "feedback": "Tu intención es buena, pero al interactuar con la Story le estás dando engagement y visibilidad. Instagram interpreta tu interacción como interés y la muestra a más gente.", "info_title": "El algoritmo no distingue", "info": "Las redes sociales funcionan por <strong>algoritmos de engagement</strong>: cualquier interacción (voto, comentario, denuncia en la propia Story) <strong>aumenta su visibilidad</strong>. Responder dentro de la publicación, aunque sea para criticarla, la hace llegar a más personas."}, {"letter": "B", "text": "No votas pero miras los resultados. Solo mirar no hace daño a nadie.", "quality": "bad", "points": 0, "feedback": "Ver los resultados genera una visualización más para la Story. Además, normaliza la situación: si \"solo miras\" tú y otros 50, la persona que la creó ve que tiene audiencia y seguirá haciéndolo.", "info_title": "El espectador alimenta el espectáculo", "info": "El <strong>efecto desinhibidor</strong> de internet se alimenta de la audiencia. Cada persona que \"solo mira\" está diciendo al agresor que su contenido funciona. <strong>Sin espectadores, no hay espectáculo</strong>. No participar significa también no consumir ese contenido."}, {"letter": "C", "text": "Denuncias la Story directamente en Instagram (sin interactuar con ella) y hablas con tu tutor/a al día siguiente.", "quality": "best", "points": 3, "feedback": "La mejor combinación: usas el mecanismo oficial de denuncia (que no genera engagement) y llevas el tema a un adulto que puede intervenir en la raíz del problema.", "info_title": "Denuncia sin alimentar", "info": "Todas las plataformas tienen <strong>botones de denuncia</strong> que no generan interacción visible. La denuncia se procesa internamente. Combinarlo con <strong>informar a un adulto de confianza</strong> ataca el problema desde dentro (plataforma) y fuera (entorno escolar)."}]}];
 
 let playerName = "";
+let teamCode = "";
 let epScore = 0;
 let scenarioScores = [];
 let currentScenario = 0;
 
+function storageKey(suffix) { return "ciberacoso_" + teamCode.toUpperCase().trim() + "_" + suffix; }
+
 // ── INIT ──
 const nameInput = document.getElementById("nameInput");
+const codeInput = document.getElementById("codeInput");
 const btnGo = document.getElementById("btnGo");
 
-// Try to load from storage
+function checkReady() {
+  const hasCode = codeInput.value.trim().length >= 2;
+  const hasName = nameInput.value.trim().length >= 2;
+  btnGo.disabled = !(hasCode && hasName);
+}
+
+// Pre-fill from localStorage if available
 (function init() {
   try {
-    const stored = localStorage.getItem("ciberacoso_name");
-    if (stored && EP_NUM > 1) {
-      nameInput.value = stored;
-      btnGo.disabled = false;
-    }
+    const lastCode = localStorage.getItem("ciberacoso_lastcode");
+    const lastName = localStorage.getItem("ciberacoso_lastname");
+    if (lastCode) codeInput.value = lastCode;
+    if (lastName) nameInput.value = lastName;
+    checkReady();
   } catch(e) {}
 })();
 
-nameInput.addEventListener("input", () => {
-  btnGo.disabled = nameInput.value.trim().length < 2;
-});
+codeInput.addEventListener("input", checkReady);
+nameInput.addEventListener("input", checkReady);
 nameInput.addEventListener("keydown", e => {
+  if (e.key==="Enter" && !btnGo.disabled) startEpisode();
+});
+codeInput.addEventListener("keydown", e => {
   if (e.key==="Enter" && !btnGo.disabled) startEpisode();
 });
 btnGo.addEventListener("click", startEpisode);
 
 function startEpisode() {
   playerName = nameInput.value.trim();
+  teamCode = codeInput.value.trim().toUpperCase();
   try {
-    localStorage.setItem("ciberacoso_name", playerName);
+    localStorage.setItem("ciberacoso_lastcode", teamCode);
+    localStorage.setItem("ciberacoso_lastname", playerName);
   } catch(e) {}
   
   document.getElementById("screenName").classList.remove("active");
   document.getElementById("screenPlay").classList.add("active");
   renderScenario(0);
-}
-
-// If name already stored and ep > 1, auto-start
-if (EP_NUM > 1) {
-  try {
-    const stored = localStorage.getItem("ciberacoso_name");
-    if (stored) {
-      nameInput.value = stored;
-      btnGo.disabled = false;
-    }
-  } catch(e) {}
 }
 
 function renderScenario(idx) {
@@ -558,17 +592,16 @@ function showEpEnd() {
 
   // Save score
   try {
-    let allScores = JSON.parse(localStorage.getItem("ciberacoso_scores") || "[]");
-    // Replace or add this episode's data
+    let allScores = JSON.parse(localStorage.getItem(storageKey("scores")) || "[]");
     allScores = allScores.filter(s => s.ep !== EP_NUM);
     allScores.push({ ep: EP_NUM, score: epScore, scenarios: scenarioScores });
-    localStorage.setItem("ciberacoso_scores", JSON.stringify(allScores));
+    localStorage.setItem(storageKey("scores"), JSON.stringify(allScores));
   } catch(e) {}
 
   // Calculate cumulative
   let cumulative = epScore;
   try {
-    const allScores = JSON.parse(localStorage.getItem("ciberacoso_scores") || "[]");
+    const allScores = JSON.parse(localStorage.getItem(storageKey("scores")) || "[]");
     cumulative = allScores.reduce((sum, s) => sum + s.score, 0);
   } catch(e) {}
 

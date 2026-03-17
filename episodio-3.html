@@ -96,17 +96,26 @@ body::before {
 .progress-info .label { color:var(--text-dim); }
 .progress-info .score { color:var(--accent); }
 
-/* Name input (ep1 only or if no stored name) */
+/* Name input */
 .name-gate {
   text-align:center; padding:40px 0;
   flex:1; display:flex; flex-direction:column;
   justify-content:center; align-items:center;
 }
 .name-gate h2 { font-size:1.3rem; margin-bottom:16px; }
-.name-gate .input-row {
-  display:flex; gap:12px; max-width:380px; width:100%;
+.name-gate .fields {
+  display:flex; flex-direction:column; gap:12px;
+  max-width:380px; width:100%;
 }
-.name-input {
+.name-gate .input-row {
+  display:flex; gap:12px; width:100%;
+}
+.field-label {
+  font-family:'Space Mono',monospace; font-size:.7rem;
+  color:var(--text-muted); letter-spacing:1px;
+  text-transform:uppercase; margin-bottom:4px; text-align:left;
+}
+.name-input,.code-input {
   flex:1; padding:14px 18px;
   background:var(--bg-card);
   border:2px solid var(--text-muted);
@@ -115,8 +124,18 @@ body::before {
   font-family:'Outfit',sans-serif; font-size:1rem;
   outline:none; transition:border-color .3s;
 }
-.name-input:focus { border-color:var(--accent); }
-.name-input::placeholder { color:var(--text-muted); }
+.code-input {
+  font-family:'Space Mono',monospace;
+  text-transform:uppercase;
+  letter-spacing:2px;
+  max-width:140px;
+}
+.name-input:focus,.code-input:focus { border-color:var(--accent); }
+.name-input::placeholder,.code-input::placeholder { color:var(--text-muted); }
+.code-hint {
+  font-size:.75rem; color:var(--text-muted);
+  margin-top:2px; text-align:left; line-height:1.4;
+}
 
 .btn-go {
   padding:14px 28px;
@@ -383,15 +402,27 @@ body::before {
   </div>
 
   <!-- NAME GATE -->
-  <div class="screen " id="screenName">
+  <div class="screen active" id="screenName">
     <div class="name-gate">
-      <h2>👋 ¡Bienvenido/a de vuelta!</h2>
+      <h2>🛡️ Misión Anti-Ciberacoso</h2>
       <p style="color:var(--text-dim);margin-bottom:20px;max-width:420px;line-height:1.6">
-        Continúa con el episodio 3.
+        Vas a vivir situaciones reales de ciberacoso y tendrás que tomar decisiones. Tus elecciones importan.
       </p>
-      <div class="input-row">
-        <input class="name-input" id="nameInput" type="text" placeholder="Tu nombre..." maxlength="30" autocomplete="off">
-        <button class="btn-go" id="btnGo" disabled>Continuar</button>
+      <div class="fields">
+        <div>
+          <div class="field-label">Código de pareja</div>
+          <div class="input-row">
+            <input class="code-input" id="codeInput" type="text" placeholder="Ej: A3-07" maxlength="10" autocomplete="off">
+          </div>
+          <div class="code-hint">Inventad un código único para vuestra pareja. Usad el MISMO código en los 4 episodios.</div>
+        </div>
+        <div>
+          <div class="field-label">Nombres</div>
+          <div class="input-row">
+            <input class="name-input" id="nameInput" type="text" placeholder="Nombre 1 y Nombre 2" maxlength="50" autocomplete="off">
+            <button class="btn-go" id="btnGo" disabled>Continuar</button>
+          </div>
+        </div>
       </div>
     </div>
   </div>
@@ -419,53 +450,56 @@ const EP_NUM = 3;
 const scenarios = [{"title": "La app de moda", "emoji": "📲", "narrative": "Hay una app nueva que está arrasando en tu instituto: todo el mundo la tiene. Al instalarla, te pide <strong>acceso a contactos, ubicación, cámara y micrófono</strong>. Tus amigos dicen que <em>\"si no aceptas todo no funciona bien\"</em>. No quieres quedarte fuera.", "choices": [{"letter": "A", "text": "Aceptas todos los permisos. Total, todas las apps piden lo mismo y a nadie le pasa nada.", "quality": "bad", "points": 0, "feedback": "\"A nadie le pasa nada\" es una ilusión. Estás dando acceso a tu ubicación en tiempo real, tus contactos, tu cámara y tu micrófono a una empresa que no conoces. Eso es mucha información personal.", "info_title": "Tus datos son valiosos", "info": "<strong>Protégete: no facilites datos personales</strong> sin pensar. Los permisos de las apps dan acceso a información muy sensible. Configura siempre la <strong>privacidad de forma adecuada y personalizada</strong> antes de empezar a usar cualquier servicio."}, {"letter": "B", "text": "Aceptas pero usas un nombre falso y no subes foto real. Así estás protegido/a.", "quality": "ok", "points": 1, "feedback": "Un nombre falso oculta tu identidad superficialmente, pero la app ya tiene acceso a tus contactos reales, tu ubicación y tu cámara. Un nombre falso no protege tus datos técnicos.", "info_title": "El anonimato superficial", "info": "Usar un nombre falso da una <strong>falsa sensación de seguridad</strong>. Los datos realmente peligrosos no son tu nombre, sino tu <strong>ubicación, tus contactos y el acceso a tu cámara</strong>. Un acosador no necesita tu nombre real si sabe dónde estás."}, {"letter": "C", "text": "Antes de instalarla, investigas qué permisos necesita realmente. Activas solo los imprescindibles y configuras el perfil como privado.", "quality": "best", "points": 3, "feedback": "Excelente criterio. Investigas antes de actuar, configuras la privacidad desde el principio y no te dejas llevar por la presión del grupo.", "info_title": "Configurar antes de usar", "info": "<strong>Configura de forma adecuada la privacidad</strong> de tus redes sociales y apps ANTES de empezar a usarlas. Perfil privado, ubicación desactivada, contactos no sincronizados. <strong>Piensa antes de publicar</strong> sobre las consecuencias de compartir esa información."}]}, {"title": "El reto viral", "emoji": "🔥", "narrative": "Hay un <strong>reto viral</strong> en TikTok que consiste en grabar a un compañero/a en una situación ridícula sin que se entere y subirlo con un hashtag. Si no participas, te dicen que eres <em>\"aburrido/a\"</em>. Un amigo ya ha grabado el vídeo y te pide que <strong>lo subas tú desde tu cuenta</strong> para que no le pillen a él.", "choices": [{"letter": "A", "text": "Lo subes pero sin etiquetar a nadie y con la cara borrosa. Así no se identifica.", "quality": "bad", "points": 0, "feedback": "En un instituto pequeño, todo el mundo sabe quién es aunque esté borroso. Además, al subirlo desde tu cuenta tú eres el responsable legal del contenido, no tu amigo.", "info_title": "Responsabilidad digital", "info": "Quien <strong>publica el contenido es responsable</strong> de él, independientemente de quién lo grabó. Además, la cara borrosa no impide la identificación en un entorno pequeño como un instituto. <strong>No hagas en la Red lo que no harías en persona.</strong>"}, {"letter": "B", "text": "Le dices que no vas a subirlo y le aconsejas que lo borre. Si insiste, pasas de él.", "quality": "best", "points": 3, "feedback": "Te niegas con firmeza, le aconsejas lo correcto y no te dejas presionar. No necesitas dar explicaciones largas: un \"no\" claro es suficiente.", "info_title": "Comunicación asertiva", "info": "Decir que no a la presión del grupo es <strong>pensamiento crítico en acción</strong>. Comunica lo que piensas de forma <strong>asertiva</strong>: clara y honestamente. No necesitas ser borde: <strong>\"No me parece bien, no lo voy a hacer\"</strong> es una frase completa."}, {"letter": "C", "text": "No lo subes tú pero le dices \"súbelo tú si quieres, es tu problema\". No quieres meterte.", "quality": "ok", "points": 1, "feedback": "No participar es bueno, pero decirle que lo suba desde su cuenta es dar luz verde al acoso. No eres responsable directo, pero podrías haber intentado frenarlo.", "info_title": "La línea entre no participar y consentir", "info": "No participar activamente y <strong>dar permiso pasivo</strong> son cosas diferentes. Decir \"haz lo que quieras\" cuando sabes que va a dañar a alguien es una forma de <strong>complicidad</strong>. Tus amigos son tus <strong>mejores aliados para protegerte y proteger a otros</strong>."}]}, {"title": "El mensaje del desconocido", "emoji": "⚠️", "narrative": "Un chico/a mayor que no conoces te escribe por privado en Instagram. Es simpático/a, te halaga y te dice que te ha visto por el instituto. Después de unos días hablando, te pide que le <strong>envíes una foto tuya \"para conocerte mejor\"</strong>. Dice que es para un <em>\"grupo privado de gente guay\"</em>.", "choices": [{"letter": "A", "text": "Le mandas una selfie normal. No tiene nada de malo, no es una foto comprometida.", "quality": "bad", "points": 0, "feedback": "Una foto \"normal\" puede ser manipulada, usada para crear un perfil falso o para avanzar hacia peticiones cada vez más personales. Es una técnica clásica de grooming: empezar con poco para ir pidiendo más.", "info_title": "Las técnicas del grooming", "info": "El <strong>grooming</strong> sigue un patrón: contacto amable → generar confianza → pedir cosas pequeñas → escalar a contenido comprometido → <strong>sextorsión</strong> (chantajear con publicar las imágenes). Todo empieza con algo que parece inofensivo."}, {"letter": "B", "text": "Le preguntas a tus amigos si conocen a esa persona y buscas más información antes de decidir.", "quality": "ok", "points": 1, "feedback": "Investigar es mejor que actuar a ciegas, pero mientras indagas sigues manteniendo la conversación con alguien potencialmente peligroso. El paso clave que falta es contárselo a un adulto.", "info_title": "Verificar no es suficiente", "info": "Los perfiles falsos pueden parecer muy reales: <strong>fotos robadas, seguidores comprados, historias creíbles</strong>. Que tus amigos \"le conozcan\" no garantiza que sea quien dice ser. La regla de oro: <strong>nunca envíes fotos a desconocidos</strong>, por muy normal que parezca la petición."}, {"letter": "C", "text": "No envías nada, le bloqueas y se lo cuentas a tus padres o un adulto de confianza.", "quality": "best", "points": 3, "feedback": "Reacción perfecta. No arriesgas nada, cortas el contacto y avisas a un adulto que puede evaluar si hay peligro real. Esto no es exagerar: es protegerte.", "info_title": "Protégete siempre", "info": "<strong>No facilites datos personales ni imágenes a desconocidos</strong>, por muy amables que parezcan. Las imágenes y vídeos pueden ser utilizados para <strong>sextorsión</strong>: chantajearte amenazando con publicarlos. Si alguien te pide fotos o te hace sentir incómodo/a, <strong>bloquea y cuenta</strong>."}]}];
 
 let playerName = "";
+let teamCode = "";
 let epScore = 0;
 let scenarioScores = [];
 let currentScenario = 0;
 
+function storageKey(suffix) { return "ciberacoso_" + teamCode.toUpperCase().trim() + "_" + suffix; }
+
 // ── INIT ──
 const nameInput = document.getElementById("nameInput");
+const codeInput = document.getElementById("codeInput");
 const btnGo = document.getElementById("btnGo");
 
-// Try to load from storage
+function checkReady() {
+  const hasCode = codeInput.value.trim().length >= 2;
+  const hasName = nameInput.value.trim().length >= 2;
+  btnGo.disabled = !(hasCode && hasName);
+}
+
+// Pre-fill from localStorage if available
 (function init() {
   try {
-    const stored = localStorage.getItem("ciberacoso_name");
-    if (stored && EP_NUM > 1) {
-      nameInput.value = stored;
-      btnGo.disabled = false;
-    }
+    const lastCode = localStorage.getItem("ciberacoso_lastcode");
+    const lastName = localStorage.getItem("ciberacoso_lastname");
+    if (lastCode) codeInput.value = lastCode;
+    if (lastName) nameInput.value = lastName;
+    checkReady();
   } catch(e) {}
 })();
 
-nameInput.addEventListener("input", () => {
-  btnGo.disabled = nameInput.value.trim().length < 2;
-});
+codeInput.addEventListener("input", checkReady);
+nameInput.addEventListener("input", checkReady);
 nameInput.addEventListener("keydown", e => {
+  if (e.key==="Enter" && !btnGo.disabled) startEpisode();
+});
+codeInput.addEventListener("keydown", e => {
   if (e.key==="Enter" && !btnGo.disabled) startEpisode();
 });
 btnGo.addEventListener("click", startEpisode);
 
 function startEpisode() {
   playerName = nameInput.value.trim();
+  teamCode = codeInput.value.trim().toUpperCase();
   try {
-    localStorage.setItem("ciberacoso_name", playerName);
+    localStorage.setItem("ciberacoso_lastcode", teamCode);
+    localStorage.setItem("ciberacoso_lastname", playerName);
   } catch(e) {}
   
   document.getElementById("screenName").classList.remove("active");
   document.getElementById("screenPlay").classList.add("active");
   renderScenario(0);
-}
-
-// If name already stored and ep > 1, auto-start
-if (EP_NUM > 1) {
-  try {
-    const stored = localStorage.getItem("ciberacoso_name");
-    if (stored) {
-      nameInput.value = stored;
-      btnGo.disabled = false;
-    }
-  } catch(e) {}
 }
 
 function renderScenario(idx) {
@@ -558,17 +592,16 @@ function showEpEnd() {
 
   // Save score
   try {
-    let allScores = JSON.parse(localStorage.getItem("ciberacoso_scores") || "[]");
-    // Replace or add this episode's data
+    let allScores = JSON.parse(localStorage.getItem(storageKey("scores")) || "[]");
     allScores = allScores.filter(s => s.ep !== EP_NUM);
     allScores.push({ ep: EP_NUM, score: epScore, scenarios: scenarioScores });
-    localStorage.setItem("ciberacoso_scores", JSON.stringify(allScores));
+    localStorage.setItem(storageKey("scores"), JSON.stringify(allScores));
   } catch(e) {}
 
   // Calculate cumulative
   let cumulative = epScore;
   try {
-    const allScores = JSON.parse(localStorage.getItem("ciberacoso_scores") || "[]");
+    const allScores = JSON.parse(localStorage.getItem(storageKey("scores")) || "[]");
     cumulative = allScores.reduce((sum, s) => sum + s.score, 0);
   } catch(e) {}
 
