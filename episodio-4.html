@@ -1,0 +1,670 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misión Anti-Ciberacoso · Episodio 4</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg-card: #111827;
+  --bg-card-hover: #1a2234;
+  --cyan: #00e5ff;
+  --purple: #7c4dff;
+  --pink: #ff4081;
+  --green: #00e676;
+  --orange: #ff9100;
+  --yellow: #ffd600;
+  --text: #e8eaf6;
+  --text-dim: #7986cb;
+  --text-muted: #3f4a6e;
+  --accent: #ff4081;
+  --radius: 16px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family:'Outfit',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);
+  background-size:40px 40px;
+  z-index:0;
+  animation:gp 8s ease-in-out infinite;
+}
+@keyframes gp { 0%,100%{opacity:.5} 50%{opacity:1} }
+
+.container {
+  position:relative; z-index:1;
+  max-width:720px; margin:0 auto;
+  padding:24px 20px; min-height:100vh;
+  display:flex; flex-direction:column;
+}
+
+/* Header */
+.ep-header {
+  text-align:center;
+  padding:20px 0 16px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  margin-bottom:20px;
+}
+
+.ep-icon { font-size:2.5rem; margin-bottom:8px; }
+
+.ep-tag {
+  font-family:'Space Mono',monospace;
+  font-size:.7rem; color:var(--accent);
+  letter-spacing:2px; text-transform:uppercase;
+}
+
+.ep-block {
+  font-size:1.4rem; font-weight:800;
+  margin:6px 0 4px;
+  background:linear-gradient(135deg, var(--accent), var(--purple));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.ep-sub { font-size:.85rem; color:var(--text-muted); }
+
+/* Progress */
+.progress-bar {
+  height:4px; background:var(--text-muted);
+  border-radius:2px; overflow:hidden; margin:16px 0 4px;
+}
+.progress-fill {
+  height:100%;
+  background:linear-gradient(90deg,var(--accent),var(--purple));
+  border-radius:2px;
+  transition:width .6s cubic-bezier(.22,1,.36,1);
+}
+.progress-info {
+  display:flex; justify-content:space-between;
+  font-family:'Space Mono',monospace; font-size:.72rem;
+}
+.progress-info .label { color:var(--text-dim); }
+.progress-info .score { color:var(--accent); }
+
+/* Name input (ep1 only or if no stored name) */
+.name-gate {
+  text-align:center; padding:40px 0;
+  flex:1; display:flex; flex-direction:column;
+  justify-content:center; align-items:center;
+}
+.name-gate h2 { font-size:1.3rem; margin-bottom:16px; }
+.name-gate .input-row {
+  display:flex; gap:12px; max-width:380px; width:100%;
+}
+.name-input {
+  flex:1; padding:14px 18px;
+  background:var(--bg-card);
+  border:2px solid var(--text-muted);
+  border-radius:var(--radius);
+  color:var(--text);
+  font-family:'Outfit',sans-serif; font-size:1rem;
+  outline:none; transition:border-color .3s;
+}
+.name-input:focus { border-color:var(--accent); }
+.name-input::placeholder { color:var(--text-muted); }
+
+.btn-go {
+  padding:14px 28px;
+  background:linear-gradient(135deg,var(--accent),var(--purple));
+  border:none; border-radius:var(--radius);
+  color:var(--bg); font-family:'Outfit',sans-serif;
+  font-size:1rem; font-weight:700;
+  cursor:pointer; transition:transform .2s,box-shadow .2s;
+  white-space:nowrap;
+}
+.btn-go:hover { transform:translateY(-2px); box-shadow:0 0 20px rgba(0,229,255,.3); }
+.btn-go:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+
+/* Screens */
+.screen { display:none; flex:1; flex-direction:column; }
+.screen.active { display:flex; }
+
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(20px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* Scenario */
+.scenario { animation:fadeIn .5s ease-out; margin-bottom:16px; }
+
+.sc-num {
+  font-family:'Space Mono',monospace; font-size:.7rem;
+  color:var(--text-muted); letter-spacing:2px;
+  text-transform:uppercase; margin-bottom:6px; margin-top:8px;
+}
+
+.sc-title { font-size:1.4rem; font-weight:800; margin-bottom:16px; }
+
+.narrative {
+  background:var(--bg-card);
+  border-left:3px solid var(--purple);
+  border-radius:0 var(--radius) var(--radius) 0;
+  padding:18px 22px; line-height:1.7; font-size:.95rem;
+  margin-bottom:20px;
+}
+.narrative .em { font-size:1.5rem; display:block; margin-bottom:8px; }
+.narrative strong { color:var(--accent); font-weight:600; }
+
+.choices-label {
+  font-family:'Space Mono',monospace; font-size:.68rem;
+  color:var(--text-muted); letter-spacing:2px;
+  text-transform:uppercase; margin-bottom:10px;
+}
+
+.choices { display:flex; flex-direction:column; gap:10px; }
+
+.choice-btn {
+  display:flex; align-items:flex-start; gap:14px;
+  padding:16px 20px;
+  background:var(--bg-card);
+  border:2px solid transparent;
+  border-radius:var(--radius);
+  color:var(--text);
+  font-family:'Outfit',sans-serif; font-size:.93rem;
+  line-height:1.5; text-align:left;
+  cursor:pointer; transition:all .25s ease;
+}
+.choice-btn:hover {
+  border-color:var(--accent);
+  background:var(--bg-card-hover);
+  transform:translateX(6px);
+}
+.choice-letter {
+  font-family:'Space Mono',monospace; font-weight:700;
+  font-size:.85rem;
+  width:32px; height:32px; min-width:32px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:8px;
+  background:rgba(124,77,255,.15); color:var(--purple);
+  margin-top:1px;
+}
+
+.choice-btn.selected { pointer-events:none; }
+.choice-btn.selected.best { border-color:var(--green); background:rgba(0,230,118,.08); }
+.choice-btn.selected.best .choice-letter { background:var(--green); color:var(--bg); }
+.choice-btn.selected.ok { border-color:var(--orange); background:rgba(255,145,0,.08); }
+.choice-btn.selected.ok .choice-letter { background:var(--orange); color:var(--bg); }
+.choice-btn.selected.bad { border-color:var(--pink); background:rgba(255,64,129,.08); }
+.choice-btn.selected.bad .choice-letter { background:var(--pink); color:var(--bg); }
+.choice-btn.dimmed { opacity:.35; pointer-events:none; }
+
+/* Feedback */
+.feedback {
+  display:none; margin-top:16px; padding:18px 22px;
+  border-radius:var(--radius); line-height:1.7; font-size:.93rem;
+  animation:fadeIn .4s ease-out;
+}
+.feedback.show { display:block; }
+.feedback.best { background:rgba(0,230,118,.08); border:1px solid rgba(0,230,118,.25); }
+.feedback.ok { background:rgba(255,145,0,.08); border:1px solid rgba(255,145,0,.25); }
+.feedback.bad { background:rgba(255,64,129,.08); border:1px solid rgba(255,64,129,.25); }
+
+.fb-head {
+  display:flex; align-items:center; gap:8px;
+  font-weight:700; font-size:1rem; margin-bottom:6px;
+}
+.feedback.best .fb-head { color:var(--green); }
+.feedback.ok .fb-head { color:var(--orange); }
+.feedback.bad .fb-head { color:var(--pink); }
+
+.pts-badge {
+  font-family:'Space Mono',monospace; font-size:.7rem;
+  padding:3px 10px; border-radius:10px; margin-left:auto;
+}
+.feedback.best .pts-badge { background:rgba(0,230,118,.2); color:var(--green); }
+.feedback.ok .pts-badge { background:rgba(255,145,0,.2); color:var(--orange); }
+.feedback.bad .pts-badge { background:rgba(255,64,129,.2); color:var(--pink); }
+
+.info-box {
+  display:none; margin-top:14px; padding:16px 20px;
+  background:rgba(124,77,255,.06);
+  border:1px solid rgba(124,77,255,.2);
+  border-radius:var(--radius);
+  font-size:.88rem; line-height:1.7; color:var(--text-dim);
+  animation:fadeIn .4s ease-out .15s both;
+}
+.info-box.show { display:block; }
+.info-box-title {
+  font-family:'Space Mono',monospace; font-size:.68rem;
+  color:var(--purple); letter-spacing:2px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+.info-box strong { color:var(--text); }
+
+.btn-continue {
+  display:none; margin-top:20px; padding:14px 0; width:100%;
+  background:transparent; border:2px solid var(--accent);
+  border-radius:var(--radius); color:var(--accent);
+  font-family:'Outfit',sans-serif; font-size:1rem; font-weight:600;
+  cursor:pointer; transition:all .25s;
+  animation:fadeIn .4s ease-out .3s both;
+}
+.btn-continue.show { display:block; }
+.btn-continue:hover {
+  background:var(--accent); color:var(--bg);
+  box-shadow:0 0 20px rgba(0,229,255,.3);
+}
+
+/* End of episode */
+.ep-end {
+  text-align:center; padding:40px 0;
+  animation:fadeIn .5s ease-out;
+}
+.ep-end h2 { font-size:1.4rem; margin-bottom:8px; }
+.ep-end p { color:var(--text-dim); margin-bottom:20px; line-height:1.6; }
+.ep-end .score-box {
+  font-family:'Space Mono',monospace; font-size:.85rem;
+  color:var(--accent); padding:10px 24px;
+  border:1px solid rgba(0,229,255,.2);
+  border-radius:var(--radius); display:inline-block;
+  margin-bottom:24px;
+}
+
+.btn-next-ep,.btn-final {
+  display:none; padding:14px 28px;
+  background:linear-gradient(135deg,var(--accent),var(--purple));
+  border:none; border-radius:var(--radius);
+  color:var(--bg); font-family:'Outfit',sans-serif;
+  font-size:1rem; font-weight:700; cursor:pointer;
+  transition:transform .2s,box-shadow .2s;
+  text-decoration:none; text-align:center;
+}
+.btn-next-ep.show,.btn-final.show { display:inline-block; }
+.btn-next-ep:hover,.btn-final:hover {
+  transform:translateY(-2px);
+  box-shadow:0 0 20px rgba(0,229,255,.3);
+}
+
+/* Results (ep4 only) */
+.results-header { text-align:center; margin-top:20px; }
+.results-icon { font-size:4rem; margin-bottom:12px; }
+.results-title { font-size:2rem; font-weight:800; margin-bottom:4px; }
+.results-subtitle { color:var(--text-dim); font-size:1.05rem; margin-bottom:28px; }
+
+.score-circle {
+  width:160px; height:160px; border-radius:50%;
+  margin:0 auto 24px;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  position:relative;
+}
+.score-circle::before {
+  content:''; position:absolute; inset:0;
+  border-radius:50%; padding:4px;
+  background:conic-gradient(var(--cyan),var(--purple),var(--cyan));
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  animation:spin 4s linear infinite;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+.score-number {
+  font-family:'Space Mono',monospace;
+  font-size:2.8rem; font-weight:700; color:var(--cyan);
+}
+.score-label { font-size:.8rem; color:var(--text-dim); }
+
+.rank-wrapper { text-align:center; margin-bottom:28px; }
+.rank-title {
+  font-size:1.2rem; font-weight:700;
+  padding:10px 24px; border-radius:var(--radius);
+  display:inline-block;
+}
+
+.summary-cards { display:flex; flex-direction:column; gap:8px; margin-bottom:28px; }
+.summary-card {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px; background:var(--bg-card); border-radius:12px;
+}
+.sc-n { font-family:'Space Mono',monospace; font-size:.72rem; color:var(--text-muted); min-width:18px; }
+.sc-t { flex:1; font-size:.88rem; color:var(--text-dim); }
+.sc-p {
+  font-family:'Space Mono',monospace; font-size:.78rem;
+  padding:4px 10px; border-radius:8px;
+}
+.sc-p.p3 { background:rgba(0,230,118,.15); color:var(--green); }
+.sc-p.p1 { background:rgba(255,145,0,.15); color:var(--orange); }
+.sc-p.p0 { background:rgba(255,64,129,.15); color:var(--pink); }
+
+.key-takeaways {
+  background:var(--bg-card); border-radius:var(--radius);
+  padding:22px 24px; margin-bottom:28px;
+}
+.key-takeaways h3 { font-size:1rem; font-weight:700; margin-bottom:14px; color:var(--cyan); }
+.takeaway-item {
+  display:flex; gap:10px; align-items:flex-start;
+  padding:7px 0; font-size:.88rem; line-height:1.5; color:var(--text-dim);
+}
+.ti { font-size:1.1rem; margin-top:1px; }
+
+.player-stamp {
+  font-family:'Space Mono',monospace; font-size:.72rem;
+  color:var(--text-muted); text-align:center;
+  margin-top:12px; padding:20px 0;
+}
+
+@media (max-width:520px) {
+  .ep-block { font-size:1.15rem; }
+  .sc-title { font-size:1.15rem; }
+  .choice-btn { padding:14px 16px; font-size:.88rem; }
+  .name-gate .input-row { flex-direction:column; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="ep-header">
+    <div class="ep-icon">⚖️</div>
+    <div class="ep-tag">Episodio 4 de 4</div>
+    <div class="ep-block">Actuación y denuncia</div>
+    <div class="ep-sub">Después de las diapositivas sobre cómo actuar, denunciar y recursos de ayuda</div>
+    <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+    <div class="progress-info">
+      <span class="label" id="progLabel">Situación 1 de 3</span>
+      <span class="score" id="progScore">0 pts</span>
+    </div>
+  </div>
+
+  <!-- NAME GATE -->
+  <div class="screen " id="screenName">
+    <div class="name-gate">
+      <h2>👋 ¡Bienvenido/a de vuelta!</h2>
+      <p style="color:var(--text-dim);margin-bottom:20px;max-width:420px;line-height:1.6">
+        Continúa con el episodio 4.
+      </p>
+      <div class="input-row">
+        <input class="name-input" id="nameInput" type="text" placeholder="Tu nombre..." maxlength="30" autocomplete="off">
+        <button class="btn-go" id="btnGo" disabled>Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIOS -->
+  <div class="screen" id="screenPlay">
+    <div id="scenarioContainer"></div>
+    
+    <div class="ep-end" id="epEnd" style="display:none">
+      <h2>✅ Episodio 4 completado</h2>
+      <p id="endMsg"></p>
+      <div class="score-box" id="endScore"></div>
+      <br><br>
+      
+        <button class="btn-final show" id="btnFinal" onclick="showFinalResults()">Ver resultados finales →</button>
+        
+    </div>
+  </div>
+
+  
+    <!-- FINAL RESULTS -->
+    <div class="screen" id="screenResults">
+      <div class="results-header">
+        <div class="results-icon" id="resultsIcon"></div>
+        <div class="results-title">Misión completada</div>
+        <div class="results-subtitle" id="resultsName"></div>
+      </div>
+      <div class="score-circle">
+        <div class="score-number" id="finalScoreNum"></div>
+        <div class="score-label">de 36 puntos</div>
+      </div>
+      <div class="rank-wrapper">
+        <div class="rank-title" id="rankTitle"></div>
+      </div>
+      <div class="summary-cards" id="summaryCards"></div>
+      <div class="key-takeaways">
+        <h3>🔑 Recuerda siempre</h3>
+        <div class="takeaway-item"><span class="ti">🚫</span><span>No reenvíes contenido humillante. La viralidad hace el daño irreparable.</span></div>
+        <div class="takeaway-item"><span class="ti">📸</span><span>Guarda siempre las pruebas: capturas de pantalla con fecha y hora.</span></div>
+        <div class="takeaway-item"><span class="ti">🗣️</span><span>Pide ayuda a un adulto de confianza. No estás solo/a.</span></div>
+        <div class="takeaway-item"><span class="ti">📞</span><span>Línea IS4K: 017 (gratuita) · Policía Nacional · Guardia Civil</span></div>
+        <div class="takeaway-item"><span class="ti">💪</span><span>Ser espectador pasivo también es parte del problema. Actúa.</span></div>
+        <div class="takeaway-item"><span class="ti">🌐</span><span>Más información: is4k.es · osi.es</span></div>
+      </div>
+      <div class="player-stamp" id="playerStamp"></div>
+    </div>
+
+</div>
+
+<script>
+const EP_NUM = 4;
+const scenarios = [{"title": "El vídeo que no para", "emoji": "🎬", "narrative": "Un vídeo humillante de una compañera de tu clase está circulando por todos los grupos. Ella <strong>no ha venido al instituto en tres días</strong>. Un profesor pregunta en clase si alguien sabe algo. Tú tienes el vídeo en tu móvil porque te lo pasaron, pero <strong>no quieres que nadie sepa que lo tienes</strong>.", "choices": [{"letter": "A", "text": "Levantas la mano y cuentas todo delante de la clase: quién lo grabó, quién lo pasó y que tú lo tienes.", "quality": "ok", "points": 1, "feedback": "Tu valentía es admirable, pero al contarlo delante de toda la clase estás exponiendo públicamente a la víctima y a ti mismo/a. Algunos compañeros implicados pueden reaccionar agresivamente ahí mismo.", "info_title": "El contexto importa", "info": "Denunciar es fundamental, pero <strong>cómo lo haces importa tanto como hacerlo</strong>. Hablar en público puede revictimizar a quien sufre el acoso y generar una reacción de grupo impredecible. La intervención de un adulto en un espacio <strong>privado y seguro</strong> es más efectiva."}, {"letter": "B", "text": "Después de clase, hablas con el profesor en privado. Le enseñas el vídeo como prueba y le cuentas lo que sabes.", "quality": "best", "points": 3, "feedback": "Perfecto. Actúas de forma discreta, aportas pruebas y permites que un adulto gestione la situación. Protege a la víctima y también te protege a ti.", "info_title": "Denunciar con inteligencia", "info": "<strong>Guardar las pruebas y entregarlas a un adulto de confianza en privado</strong> es el protocolo más efectivo. El profesor puede activar el protocolo de acoso del centro sin exponer a nadie. Recuerda: <strong>tú no tienes la culpa</strong> por tener el vídeo si no lo difundiste."}, {"letter": "C", "text": "Borras el vídeo de tu móvil y no dices nada. No quieres problemas y tú no lo grabaste.", "quality": "bad", "points": 0, "feedback": "Al borrar el vídeo destruyes una prueba que podría ayudar a tu compañera. Y al callar, la situación sigue sin resolverse. Ella lleva tres días sin venir al instituto.", "info_title": "Las pruebas salvan", "info": "<strong>Si te acosan o conoces un caso: guarda las pruebas.</strong> Capturas de pantalla, vídeos, mensajes con fecha y hora. Son fundamentales para que el centro educativo o las autoridades puedan actuar. Borrar evidencias protege al agresor, no a la víctima."}]}, {"title": "Tu primo pequeño", "emoji": "👦", "narrative": "Tu primo de 10 años te enseña orgulloso sus conversaciones con un <em>\"amigo nuevo\"</em> que conoció en un juego online. El \"amigo\" le <strong>pide que no le cuente a nadie que hablan</strong> y le ha preguntado en qué colegio estudia y a qué hora sale de clase. Tu primo dice que <em>\"es majo y le ayuda en el juego\"</em>.", "choices": [{"letter": "A", "text": "Le dices que tenga cuidado pero que seguramente sea otro niño jugando. No quieres asustarlo.", "quality": "bad", "points": 0, "feedback": "Un adulto que pide secretos a un menor y pregunta por su horario y ubicación muestra señales claras de peligro. Quitarle importancia pone en riesgo a tu primo.", "info_title": "Señales de alerta", "info": "Las señales de <strong>grooming</strong> son claras: un desconocido que <strong>pide mantener la relación en secreto</strong>, que pregunta por datos personales (colegio, horario, dirección) y que genera dependencia emocional. <strong>Cualquier adulto que pide a un menor guardar secretos es una señal de alarma.</strong>"}, {"letter": "B", "text": "Le dices a tu primo que bloquee inmediatamente a esa persona y no hable más con desconocidos.", "quality": "ok", "points": 1, "feedback": "Bloquear corta el contacto, pero no resuelve el problema: esa persona puede contactar a otros niños. Y sin guardar pruebas, no se puede denunciar ni investigar.", "info_title": "Bloquear no basta", "info": "Bloquear es un primer paso de protección, pero <strong>sin pruebas no hay denuncia posible</strong>. Además, el agresor sigue activo y puede buscar a otras víctimas. Para proteger de verdad, hay que <strong>guardar pruebas + informar a un adulto + denunciar si es necesario</strong>."}, {"letter": "C", "text": "Hablas inmediatamente con tus tíos, les enseñas las conversaciones y guardáis capturas antes de bloquear.", "quality": "best", "points": 3, "feedback": "Acción completa: involucras a los adultos responsables, conservas las pruebas (que pueden servir para una denuncia) y luego se bloquea al contacto. Podrías estar evitando algo muy grave.", "info_title": "Actúa con urgencia", "info": "<strong>Pide ayuda con urgencia si la amenaza es grave.</strong> Los padres/tutores pueden denunciar ante la Policía Nacional o Guardia Civil, que tienen unidades especializadas en delitos telemáticos contra menores. La <strong>línea IS4K (017)</strong> es gratuita y confidencial."}]}, {"title": "Las represalias", "emoji": "🔄", "narrative": "La semana pasada denunciaste un caso de ciberacoso al orientador del instituto. Funcionó: el acosador fue sancionado. Pero ahora <strong>él ha descubierto que fuiste tú</strong> y te está enviando mensajes amenazantes: <em>\"Te vas a enterar, chivato/a\"</em>. Algunos de sus amigos te miran mal en el pasillo.", "choices": [{"letter": "A", "text": "Le respondes que si no para, esta vez vas directo a la policía. Así ve que no te da miedo.", "quality": "ok", "points": 1, "feedback": "Advertirle no está mal, pero al responder estás dándole una reacción (que es lo que busca) y manteniendo un canal de comunicación. Además, las amenazas por escrito tuyas podrían ser sacadas de contexto.", "info_title": "No respondas a provocaciones", "info": "La primera regla: <strong>no contestes a las provocaciones</strong>. Al responder, aunque sea para defenderte, le das al agresor una reacción emocional que le da poder. Tus mensajes pueden ser <strong>manipulados o sacados de contexto</strong>. Deja que los adultos gestionen la comunicación."}, {"letter": "B", "text": "Ignoras los mensajes y aguantas. Ya pasará. No quieres ser \"el pesado\" que denuncia dos veces.", "quality": "bad", "points": 0, "feedback": "Aguantar en silencio es exactamente lo que el acosador espera. Las represalias por denunciar son un agravante serio y debes comunicarlo. No eres pesado/a: estás ejerciendo tu derecho.", "info_title": "Las represalias son un agravante", "info": "Las <strong>represalias contra quien denuncia</strong> son especialmente graves y los protocolos de los centros educativos las contemplan como un <strong>agravante de la sanción</strong>. No denunciar por miedo a \"ser pesado\" es exactamente lo que el agresor quiere conseguir."}, {"letter": "C", "text": "Guardas capturas de todos los mensajes amenazantes y vuelves a hablar con el orientador/a para informar de las represalias.", "quality": "best", "points": 3, "feedback": "Perfecto. Guardas pruebas y vuelves a activar el canal de ayuda. Las represalias son un problema nuevo que requiere una nueva intervención. No tienes que gestionarlo solo/a.", "info_title": "Denuncia las veces que haga falta", "info": "Si la situación se repite o aparecen represalias: <strong>vuelve a denunciar, siempre con pruebas</strong>. Los centros educativos, la <strong>línea IS4K (017)</strong>, la <strong>Policía Nacional</strong> y la <strong>Guardia Civil</strong> están para ayudarte. Más info en <strong>is4k.es</strong> y <strong>osi.es</strong>. <strong>¡Tolerancia cero al ciberacoso!</strong>"}]}];
+
+let playerName = "";
+let epScore = 0;
+let scenarioScores = [];
+let currentScenario = 0;
+
+// ── INIT ──
+const nameInput = document.getElementById("nameInput");
+const btnGo = document.getElementById("btnGo");
+
+// Try to load from storage
+(function init() {
+  try {
+    const stored = localStorage.getItem("ciberacoso_name");
+    if (stored && EP_NUM > 1) {
+      nameInput.value = stored;
+      btnGo.disabled = false;
+    }
+  } catch(e) {}
+})();
+
+nameInput.addEventListener("input", () => {
+  btnGo.disabled = nameInput.value.trim().length < 2;
+});
+nameInput.addEventListener("keydown", e => {
+  if (e.key==="Enter" && !btnGo.disabled) startEpisode();
+});
+btnGo.addEventListener("click", startEpisode);
+
+function startEpisode() {
+  playerName = nameInput.value.trim();
+  try {
+    localStorage.setItem("ciberacoso_name", playerName);
+  } catch(e) {}
+  
+  document.getElementById("screenName").classList.remove("active");
+  document.getElementById("screenPlay").classList.add("active");
+  renderScenario(0);
+}
+
+// If name already stored and ep > 1, auto-start
+if (EP_NUM > 1) {
+  try {
+    const stored = localStorage.getItem("ciberacoso_name");
+    if (stored) {
+      nameInput.value = stored;
+      btnGo.disabled = false;
+    }
+  } catch(e) {}
+}
+
+function renderScenario(idx) {
+  const sc = scenarios[idx];
+  currentScenario = idx;
+  
+  const choicesHtml = sc.choices.map((c, ci) => `
+    <button class="choice-btn" onclick="selectChoice(${idx}, ${ci})">
+      <span class="choice-letter">${c.letter}</span>
+      <span>${c.text}</span>
+    </button>
+  `).join("");
+
+  document.getElementById("scenarioContainer").innerHTML = `
+    <div class="scenario">
+      <div class="sc-num">Situación ${idx+1} de 3</div>
+      <h2 class="sc-title">${sc.title}</h2>
+      <div class="narrative">
+        <span class="em">${sc.emoji}</span>
+        ${sc.narrative}
+      </div>
+      <div class="choices-label">¿Qué haces?</div>
+      <div class="choices" id="choices${idx}">${choicesHtml}</div>
+      <div class="feedback" id="feedback${idx}"></div>
+      <div class="info-box" id="info${idx}"></div>
+      <button class="btn-continue" id="btnCont${idx}" onclick="nextScenario(${idx})">
+        ${idx < 2 ? "Siguiente situación →" : "Ver resultado del episodio →"}
+      </button>
+    </div>
+  `;
+
+  document.getElementById("progFill").style.width = ((idx)/3*100) + "%";
+  document.getElementById("progLabel").textContent = `Situación ${idx+1} de 3`;
+  document.getElementById("progScore").textContent = epScore + " pts";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function selectChoice(scIdx, cIdx) {
+  const sc = scenarios[scIdx];
+  const c = sc.choices[cIdx];
+
+  const btns = document.querySelectorAll(`#choices${scIdx} .choice-btn`);
+  btns.forEach((btn, i) => {
+    if (i === cIdx) btn.classList.add("selected", c.quality);
+    else btn.classList.add("dimmed");
+  });
+
+  epScore += c.points;
+  scenarioScores.push({ title: sc.title, points: c.points });
+
+  const labels = { best:"✅ ¡Gran decisión!", ok:"🟡 Podría ser mejor", bad:"❌ Mala elección" };
+  const ptsText = c.points===3 ? "+3 pts" : c.points===1 ? "+1 pt" : "+0 pts";
+
+  const fb = document.getElementById(`feedback${scIdx}`);
+  fb.className = `feedback show ${c.quality}`;
+  fb.innerHTML = `
+    <div class="fb-head">
+      <span>${labels[c.quality]}</span>
+      <span class="pts-badge">${ptsText}</span>
+    </div>
+    <p>${c.feedback}</p>
+  `;
+
+  const info = document.getElementById(`info${scIdx}`);
+  info.className = "info-box show";
+  info.innerHTML = `
+    <div class="info-box-title">💡 ${c.info_title}</div>
+    <p>${c.info}</p>
+  `;
+
+  document.getElementById(`btnCont${scIdx}`).classList.add("show");
+  document.getElementById("progScore").textContent = epScore + " pts";
+}
+
+function nextScenario(fromIdx) {
+  if (fromIdx < 2) {
+    renderScenario(fromIdx + 1);
+  } else {
+    showEpEnd();
+  }
+}
+
+function showEpEnd() {
+  document.getElementById("scenarioContainer").style.display = "none";
+  const epEnd = document.getElementById("epEnd");
+  epEnd.style.display = "block";
+  
+  document.getElementById("progFill").style.width = "100%";
+  document.getElementById("progLabel").textContent = "Episodio 4 completado";
+
+  // Save score
+  try {
+    let allScores = JSON.parse(localStorage.getItem("ciberacoso_scores") || "[]");
+    // Replace or add this episode's data
+    allScores = allScores.filter(s => s.ep !== EP_NUM);
+    allScores.push({ ep: EP_NUM, score: epScore, scenarios: scenarioScores });
+    localStorage.setItem("ciberacoso_scores", JSON.stringify(allScores));
+  } catch(e) {}
+
+  // Calculate cumulative
+  let cumulative = epScore;
+  try {
+    const allScores = JSON.parse(localStorage.getItem("ciberacoso_scores") || "[]");
+    cumulative = allScores.reduce((sum, s) => sum + s.score, 0);
+  } catch(e) {}
+
+  document.getElementById("endMsg").textContent = 
+    `${playerName}, has obtenido ${epScore} de 9 puntos en este episodio.`;
+  document.getElementById("endScore").textContent = 
+    `Puntuación acumulada: ${cumulative} de ${EP_NUM * 9} pts`;
+
+  const nextBtn = document.getElementById("btnNextEp") || document.getElementById("btnFinal");
+  if (nextBtn) nextBtn.classList.add("show");
+  
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+
+function showFinalResults() {
+  document.getElementById("screenPlay").classList.remove("active");
+  document.getElementById("screenResults").classList.add("active");
+
+  let allScores = [];
+  let totalScore = 0;
+  try {
+    allScores = JSON.parse(localStorage.getItem("ciberacoso_scores") || "[]");
+    totalScore = allScores.reduce((sum, s) => sum + s.score, 0);
+  } catch(e) { totalScore = epScore; }
+
+  const ranks = [
+    { min:30, icon:"🏆", title:"Experto/a en ciberseguridad", color:"var(--green)", bg:"rgba(0,230,118,.1)" },
+    { min:20, icon:"✅", title:"Buen/a ciberciudadano/a", color:"var(--cyan)", bg:"rgba(0,229,255,.1)" },
+    { min:10, icon:"⚠️", title:"Necesitas reforzar", color:"var(--orange)", bg:"rgba(255,145,0,.1)" },
+    { min:0,  icon:"🔴", title:"Zona de riesgo", color:"var(--pink)", bg:"rgba(255,64,129,.1)" },
+  ];
+  const rank = ranks.find(r => totalScore >= r.min);
+
+  document.getElementById("resultsIcon").textContent = rank.icon;
+  document.getElementById("resultsName").textContent = playerName;
+  document.getElementById("finalScoreNum").textContent = totalScore;
+
+  const rt = document.getElementById("rankTitle");
+  rt.textContent = rank.title;
+  rt.style.color = rank.color;
+  rt.style.background = rank.bg;
+
+  // Build summary from all episodes
+  const epNames = ["¿Qué es el ciberacoso?", "Roles y tipos", "Prevención", "Actuación y denuncia"];
+  let cardsHtml = "";
+  allScores.sort((a,b) => a.ep - b.ep);
+  allScores.forEach(epData => {
+    epData.scenarios.forEach((s, i) => {
+      const cls = s.points===3?"p3":s.points===1?"p1":"p0";
+      const epLabel = i===0 ? `Ep${epData.ep}` : "";
+      cardsHtml += `<div class="summary-card">
+        <span class="sc-n">${epLabel}</span>
+        <span class="sc-t">${s.title}</span>
+        <span class="sc-p ${cls}">${s.points}/3</span>
+      </div>`;
+    });
+  });
+  document.getElementById("summaryCards").innerHTML = cardsHtml;
+
+  const now = new Date();
+  const d = now.toLocaleDateString("es-ES") + " " + 
+            now.toLocaleTimeString("es-ES",{hour:"2-digit",minute:"2-digit"});
+  document.getElementById("playerStamp").textContent = 
+    `${playerName} · ${d} · ${totalScore}/36 pts`;
+
+  window.scrollTo({ top:0, behavior:"smooth" });
+}
+
+</script>
+</body>
+</html>

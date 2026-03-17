@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misión Anti-Ciberacoso</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Outfit',sans-serif;background:#0a0e1a;color:#e8eaf6;min-height:100vh;display:flex;align-items:center;justify-content:center}
+body::before{content:'';position:fixed;inset:0;background-image:linear-gradient(rgba(0,229,255,.03) 1px,transparent 1px),linear-gradient(90deg,rgba(0,229,255,.03) 1px,transparent 1px);background-size:40px 40px;z-index:0}
+.wrap{position:relative;z-index:1;max-width:520px;padding:40px 24px;text-align:center}
+.icon{font-size:3.5rem;margin-bottom:12px}
+h1{font-size:2rem;font-weight:800;background:linear-gradient(135deg,#00e5ff,#7c4dff);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;margin-bottom:8px}
+.sub{color:#7986cb;margin-bottom:36px;line-height:1.6}
+.eps{display:flex;flex-direction:column;gap:12px}
+a.ep{display:flex;align-items:center;gap:16px;padding:18px 22px;background:#111827;border:2px solid transparent;border-radius:16px;color:#e8eaf6;text-decoration:none;transition:all .25s}
+a.ep:hover{border-color:#00e5ff;background:#1a2234;transform:translateX(6px)}
+.ep-num{font-family:'Space Mono',monospace;font-size:.75rem;width:36px;height:36px;min-width:36px;display:flex;align-items:center;justify-content:center;border-radius:10px;background:rgba(124,77,255,.15);color:#7c4dff;font-weight:700}
+.ep-info{text-align:left}
+.ep-name{font-weight:700;font-size:1rem;margin-bottom:2px}
+.ep-desc{font-size:.82rem;color:#7986cb}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="icon">🛡️</div>
+  <h1>Misión Anti‑Ciberacoso</h1>
+  <p class="sub">Elige tu aventura · 4 episodios</p>
+  <div class="eps">
+    <a class="ep" href="episodio-1.html">
+      <span class="ep-num">1</span>
+      <div class="ep-info">
+        <div class="ep-name">🔍 ¿Qué es el ciberacoso?</div>
+        <div class="ep-desc">El meme · El audio · La encuesta</div>
+      </div>
+    </a>
+    <a class="ep" href="episodio-2.html">
+      <span class="ep-num">2</span>
+      <div class="ep-info">
+        <div class="ep-name">👥 Roles y tipos</div>
+        <div class="ep-desc">La cuenta secreta · La foto · El grupo</div>
+      </div>
+    </a>
+    <a class="ep" href="episodio-3.html">
+      <span class="ep-num">3</span>
+      <div class="ep-info">
+        <div class="ep-name">🛡️ Prevención</div>
+        <div class="ep-desc">La app · El reto viral · El desconocido</div>
+      </div>
+    </a>
+    <a class="ep" href="episodio-4.html">
+      <span class="ep-num">4</span>
+      <div class="ep-info">
+        <div class="ep-name">⚖️ Actuación y denuncia</div>
+        <div class="ep-desc">El vídeo · Tu primo · Las represalias</div>
+      </div>
+    </a>
+  </div>
+</div>
+</body>
+</html>

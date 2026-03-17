@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Misión Anti-Ciberacoso · Episodio 3</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;800&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0a0e1a;
+  --bg-card: #111827;
+  --bg-card-hover: #1a2234;
+  --cyan: #00e5ff;
+  --purple: #7c4dff;
+  --pink: #ff4081;
+  --green: #00e676;
+  --orange: #ff9100;
+  --yellow: #ffd600;
+  --text: #e8eaf6;
+  --text-dim: #7986cb;
+  --text-muted: #3f4a6e;
+  --accent: #00e676;
+  --radius: 16px;
+}
+
+* { margin:0; padding:0; box-sizing:border-box; }
+
+body {
+  font-family:'Outfit',sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+}
+
+body::before {
+  content:'';
+  position:fixed; inset:0;
+  background-image:
+    linear-gradient(rgba(0,229,255,0.03) 1px,transparent 1px),
+    linear-gradient(90deg,rgba(0,229,255,0.03) 1px,transparent 1px);
+  background-size:40px 40px;
+  z-index:0;
+  animation:gp 8s ease-in-out infinite;
+}
+@keyframes gp { 0%,100%{opacity:.5} 50%{opacity:1} }
+
+.container {
+  position:relative; z-index:1;
+  max-width:720px; margin:0 auto;
+  padding:24px 20px; min-height:100vh;
+  display:flex; flex-direction:column;
+}
+
+/* Header */
+.ep-header {
+  text-align:center;
+  padding:20px 0 16px;
+  border-bottom:1px solid rgba(255,255,255,0.06);
+  margin-bottom:20px;
+}
+
+.ep-icon { font-size:2.5rem; margin-bottom:8px; }
+
+.ep-tag {
+  font-family:'Space Mono',monospace;
+  font-size:.7rem; color:var(--accent);
+  letter-spacing:2px; text-transform:uppercase;
+}
+
+.ep-block {
+  font-size:1.4rem; font-weight:800;
+  margin:6px 0 4px;
+  background:linear-gradient(135deg, var(--accent), var(--purple));
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+
+.ep-sub { font-size:.85rem; color:var(--text-muted); }
+
+/* Progress */
+.progress-bar {
+  height:4px; background:var(--text-muted);
+  border-radius:2px; overflow:hidden; margin:16px 0 4px;
+}
+.progress-fill {
+  height:100%;
+  background:linear-gradient(90deg,var(--accent),var(--purple));
+  border-radius:2px;
+  transition:width .6s cubic-bezier(.22,1,.36,1);
+}
+.progress-info {
+  display:flex; justify-content:space-between;
+  font-family:'Space Mono',monospace; font-size:.72rem;
+}
+.progress-info .label { color:var(--text-dim); }
+.progress-info .score { color:var(--accent); }
+
+/* Name input (ep1 only or if no stored name) */
+.name-gate {
+  text-align:center; padding:40px 0;
+  flex:1; display:flex; flex-direction:column;
+  justify-content:center; align-items:center;
+}
+.name-gate h2 { font-size:1.3rem; margin-bottom:16px; }
+.name-gate .input-row {
+  display:flex; gap:12px; max-width:380px; width:100%;
+}
+.name-input {
+  flex:1; padding:14px 18px;
+  background:var(--bg-card);
+  border:2px solid var(--text-muted);
+  border-radius:var(--radius);
+  color:var(--text);
+  font-family:'Outfit',sans-serif; font-size:1rem;
+  outline:none; transition:border-color .3s;
+}
+.name-input:focus { border-color:var(--accent); }
+.name-input::placeholder { color:var(--text-muted); }
+
+.btn-go {
+  padding:14px 28px;
+  background:linear-gradient(135deg,var(--accent),var(--purple));
+  border:none; border-radius:var(--radius);
+  color:var(--bg); font-family:'Outfit',sans-serif;
+  font-size:1rem; font-weight:700;
+  cursor:pointer; transition:transform .2s,box-shadow .2s;
+  white-space:nowrap;
+}
+.btn-go:hover { transform:translateY(-2px); box-shadow:0 0 20px rgba(0,229,255,.3); }
+.btn-go:disabled { opacity:.4; cursor:not-allowed; transform:none; }
+
+/* Screens */
+.screen { display:none; flex:1; flex-direction:column; }
+.screen.active { display:flex; }
+
+@keyframes fadeIn {
+  from { opacity:0; transform:translateY(20px); }
+  to { opacity:1; transform:translateY(0); }
+}
+
+/* Scenario */
+.scenario { animation:fadeIn .5s ease-out; margin-bottom:16px; }
+
+.sc-num {
+  font-family:'Space Mono',monospace; font-size:.7rem;
+  color:var(--text-muted); letter-spacing:2px;
+  text-transform:uppercase; margin-bottom:6px; margin-top:8px;
+}
+
+.sc-title { font-size:1.4rem; font-weight:800; margin-bottom:16px; }
+
+.narrative {
+  background:var(--bg-card);
+  border-left:3px solid var(--purple);
+  border-radius:0 var(--radius) var(--radius) 0;
+  padding:18px 22px; line-height:1.7; font-size:.95rem;
+  margin-bottom:20px;
+}
+.narrative .em { font-size:1.5rem; display:block; margin-bottom:8px; }
+.narrative strong { color:var(--accent); font-weight:600; }
+
+.choices-label {
+  font-family:'Space Mono',monospace; font-size:.68rem;
+  color:var(--text-muted); letter-spacing:2px;
+  text-transform:uppercase; margin-bottom:10px;
+}
+
+.choices { display:flex; flex-direction:column; gap:10px; }
+
+.choice-btn {
+  display:flex; align-items:flex-start; gap:14px;
+  padding:16px 20px;
+  background:var(--bg-card);
+  border:2px solid transparent;
+  border-radius:var(--radius);
+  color:var(--text);
+  font-family:'Outfit',sans-serif; font-size:.93rem;
+  line-height:1.5; text-align:left;
+  cursor:pointer; transition:all .25s ease;
+}
+.choice-btn:hover {
+  border-color:var(--accent);
+  background:var(--bg-card-hover);
+  transform:translateX(6px);
+}
+.choice-letter {
+  font-family:'Space Mono',monospace; font-weight:700;
+  font-size:.85rem;
+  width:32px; height:32px; min-width:32px;
+  display:flex; align-items:center; justify-content:center;
+  border-radius:8px;
+  background:rgba(124,77,255,.15); color:var(--purple);
+  margin-top:1px;
+}
+
+.choice-btn.selected { pointer-events:none; }
+.choice-btn.selected.best { border-color:var(--green); background:rgba(0,230,118,.08); }
+.choice-btn.selected.best .choice-letter { background:var(--green); color:var(--bg); }
+.choice-btn.selected.ok { border-color:var(--orange); background:rgba(255,145,0,.08); }
+.choice-btn.selected.ok .choice-letter { background:var(--orange); color:var(--bg); }
+.choice-btn.selected.bad { border-color:var(--pink); background:rgba(255,64,129,.08); }
+.choice-btn.selected.bad .choice-letter { background:var(--pink); color:var(--bg); }
+.choice-btn.dimmed { opacity:.35; pointer-events:none; }
+
+/* Feedback */
+.feedback {
+  display:none; margin-top:16px; padding:18px 22px;
+  border-radius:var(--radius); line-height:1.7; font-size:.93rem;
+  animation:fadeIn .4s ease-out;
+}
+.feedback.show { display:block; }
+.feedback.best { background:rgba(0,230,118,.08); border:1px solid rgba(0,230,118,.25); }
+.feedback.ok { background:rgba(255,145,0,.08); border:1px solid rgba(255,145,0,.25); }
+.feedback.bad { background:rgba(255,64,129,.08); border:1px solid rgba(255,64,129,.25); }
+
+.fb-head {
+  display:flex; align-items:center; gap:8px;
+  font-weight:700; font-size:1rem; margin-bottom:6px;
+}
+.feedback.best .fb-head { color:var(--green); }
+.feedback.ok .fb-head { color:var(--orange); }
+.feedback.bad .fb-head { color:var(--pink); }
+
+.pts-badge {
+  font-family:'Space Mono',monospace; font-size:.7rem;
+  padding:3px 10px; border-radius:10px; margin-left:auto;
+}
+.feedback.best .pts-badge { background:rgba(0,230,118,.2); color:var(--green); }
+.feedback.ok .pts-badge { background:rgba(255,145,0,.2); color:var(--orange); }
+.feedback.bad .pts-badge { background:rgba(255,64,129,.2); color:var(--pink); }
+
+.info-box {
+  display:none; margin-top:14px; padding:16px 20px;
+  background:rgba(124,77,255,.06);
+  border:1px solid rgba(124,77,255,.2);
+  border-radius:var(--radius);
+  font-size:.88rem; line-height:1.7; color:var(--text-dim);
+  animation:fadeIn .4s ease-out .15s both;
+}
+.info-box.show { display:block; }
+.info-box-title {
+  font-family:'Space Mono',monospace; font-size:.68rem;
+  color:var(--purple); letter-spacing:2px;
+  text-transform:uppercase; margin-bottom:6px;
+}
+.info-box strong { color:var(--text); }
+
+.btn-continue {
+  display:none; margin-top:20px; padding:14px 0; width:100%;
+  background:transparent; border:2px solid var(--accent);
+  border-radius:var(--radius); color:var(--accent);
+  font-family:'Outfit',sans-serif; font-size:1rem; font-weight:600;
+  cursor:pointer; transition:all .25s;
+  animation:fadeIn .4s ease-out .3s both;
+}
+.btn-continue.show { display:block; }
+.btn-continue:hover {
+  background:var(--accent); color:var(--bg);
+  box-shadow:0 0 20px rgba(0,229,255,.3);
+}
+
+/* End of episode */
+.ep-end {
+  text-align:center; padding:40px 0;
+  animation:fadeIn .5s ease-out;
+}
+.ep-end h2 { font-size:1.4rem; margin-bottom:8px; }
+.ep-end p { color:var(--text-dim); margin-bottom:20px; line-height:1.6; }
+.ep-end .score-box {
+  font-family:'Space Mono',monospace; font-size:.85rem;
+  color:var(--accent); padding:10px 24px;
+  border:1px solid rgba(0,229,255,.2);
+  border-radius:var(--radius); display:inline-block;
+  margin-bottom:24px;
+}
+
+.btn-next-ep,.btn-final {
+  display:none; padding:14px 28px;
+  background:linear-gradient(135deg,var(--accent),var(--purple));
+  border:none; border-radius:var(--radius);
+  color:var(--bg); font-family:'Outfit',sans-serif;
+  font-size:1rem; font-weight:700; cursor:pointer;
+  transition:transform .2s,box-shadow .2s;
+  text-decoration:none; text-align:center;
+}
+.btn-next-ep.show,.btn-final.show { display:inline-block; }
+.btn-next-ep:hover,.btn-final:hover {
+  transform:translateY(-2px);
+  box-shadow:0 0 20px rgba(0,229,255,.3);
+}
+
+/* Results (ep4 only) */
+.results-header { text-align:center; margin-top:20px; }
+.results-icon { font-size:4rem; margin-bottom:12px; }
+.results-title { font-size:2rem; font-weight:800; margin-bottom:4px; }
+.results-subtitle { color:var(--text-dim); font-size:1.05rem; margin-bottom:28px; }
+
+.score-circle {
+  width:160px; height:160px; border-radius:50%;
+  margin:0 auto 24px;
+  display:flex; flex-direction:column;
+  align-items:center; justify-content:center;
+  position:relative;
+}
+.score-circle::before {
+  content:''; position:absolute; inset:0;
+  border-radius:50%; padding:4px;
+  background:conic-gradient(var(--cyan),var(--purple),var(--cyan));
+  -webkit-mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  mask:linear-gradient(#fff 0 0) content-box,linear-gradient(#fff 0 0);
+  -webkit-mask-composite:xor; mask-composite:exclude;
+  animation:spin 4s linear infinite;
+}
+@keyframes spin { to{transform:rotate(360deg)} }
+.score-number {
+  font-family:'Space Mono',monospace;
+  font-size:2.8rem; font-weight:700; color:var(--cyan);
+}
+.score-label { font-size:.8rem; color:var(--text-dim); }
+
+.rank-wrapper { text-align:center; margin-bottom:28px; }
+.rank-title {
+  font-size:1.2rem; font-weight:700;
+  padding:10px 24px; border-radius:var(--radius);
+  display:inline-block;
+}
+
+.summary-cards { display:flex; flex-direction:column; gap:8px; margin-bottom:28px; }
+.summary-card {
+  display:flex; align-items:center; gap:12px;
+  padding:12px 16px; background:var(--bg-card); border-radius:12px;
+}
+.sc-n { font-family:'Space Mono',monospace; font-size:.72rem; color:var(--text-muted); min-width:18px; }
+.sc-t { flex:1; font-size:.88rem; color:var(--text-dim); }
+.sc-p {
+  font-family:'Space Mono',monospace; font-size:.78rem;
+  padding:4px 10px; border-radius:8px;
+}
+.sc-p.p3 { background:rgba(0,230,118,.15); color:var(--green); }
+.sc-p.p1 { background:rgba(255,145,0,.15); color:var(--orange); }
+.sc-p.p0 { background:rgba(255,64,129,.15); color:var(--pink); }
+
+.key-takeaways {
+  background:var(--bg-card); border-radius:var(--radius);
+  padding:22px 24px; margin-bottom:28px;
+}
+.key-takeaways h3 { font-size:1rem; font-weight:700; margin-bottom:14px; color:var(--cyan); }
+.takeaway-item {
+  display:flex; gap:10px; align-items:flex-start;
+  padding:7px 0; font-size:.88rem; line-height:1.5; color:var(--text-dim);
+}
+.ti { font-size:1.1rem; margin-top:1px; }
+
+.player-stamp {
+  font-family:'Space Mono',monospace; font-size:.72rem;
+  color:var(--text-muted); text-align:center;
+  margin-top:12px; padding:20px 0;
+}
+
+@media (max-width:520px) {
+  .ep-block { font-size:1.15rem; }
+  .sc-title { font-size:1.15rem; }
+  .choice-btn { padding:14px 16px; font-size:.88rem; }
+  .name-gate .input-row { flex-direction:column; }
+}
+</style>
+</head>
+<body>
+
+<div class="container">
+
+  <div class="ep-header">
+    <div class="ep-icon">🛡️</div>
+    <div class="ep-tag">Episodio 3 de 4</div>
+    <div class="ep-block">Prevención del ciberacoso</div>
+    <div class="ep-sub">Después de las diapositivas sobre prevención, privacidad, netiqueta y pensamiento crítico</div>
+    <div class="progress-bar"><div class="progress-fill" id="progFill" style="width:0%"></div></div>
+    <div class="progress-info">
+      <span class="label" id="progLabel">Situación 1 de 3</span>
+      <span class="score" id="progScore">0 pts</span>
+    </div>
+  </div>
+
+  <!-- NAME GATE -->
+  <div class="screen " id="screenName">
+    <div class="name-gate">
+      <h2>👋 ¡Bienvenido/a de vuelta!</h2>
+      <p style="color:var(--text-dim);margin-bottom:20px;max-width:420px;line-height:1.6">
+        Continúa con el episodio 3.
+      </p>
+      <div class="input-row">
+        <input class="name-input" id="nameInput" type="text" placeholder="Tu nombre..." maxlength="30" autocomplete="off">
+        <button class="btn-go" id="btnGo" disabled>Continuar</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENARIOS -->
+  <div class="screen" id="screenPlay">
+    <div id="scenarioContainer"></div>
+    
+    <div class="ep-end" id="epEnd" style="display:none">
+      <h2>✅ Episodio 3 completado</h2>
+      <p id="endMsg"></p>
+      <div class="score-box" id="endScore"></div>
+      <br><br>
+      
+        <a class="btn-next-ep" id="btnNextEp" href="episodio-4.html">Episodio 4 →</a>
+        
+    </div>
+  </div>
+
+  
+</div>
+
+<script>
+const EP_NUM = 3;
+const scenarios = [{"title": "La app de moda", "emoji": "📲", "narrative": "Hay una app nueva que está arrasando en tu instituto: todo el mundo la tiene. Al instalarla, te pide <strong>acceso a contactos, ubicación, cámara y micrófono</strong>. Tus amigos dicen que <em>\"si no aceptas todo no funciona bien\"</em>. No quieres quedarte fuera.", "choices": [{"letter": "A", "text": "Aceptas todos los permisos. Total, todas las apps piden lo mismo y a nadie le pasa nada.", "quality": "bad", "points": 0, "feedback": "\"A nadie le pasa nada\" es una ilusión. Estás dando acceso a tu ubicación en tiempo real, tus contactos, tu cámara y tu micrófono a una empresa que no conoces. Eso es mucha información personal.", "info_title": "Tus datos son valiosos", "info": "<strong>Protégete: no facilites datos personales</strong> sin pensar. Los permisos de las apps dan acceso a información muy sensible. Configura siempre la <strong>privacidad de forma adecuada y personalizada</strong> antes de empezar a usar cualquier servicio."}, {"letter": "B", "text": "Aceptas pero usas un nombre falso y no subes foto real. Así estás protegido/a.", "quality": "ok", "points": 1, "feedback": "Un nombre falso oculta tu identidad superficialmente, pero la app ya tiene acceso a tus contactos reales, tu ubicación y tu cámara. Un nombre falso no protege tus datos técnicos.", "info_title": "El anonimato superficial", "info": "Usar un nombre falso da una <strong>falsa sensación de seguridad</strong>. Los datos realmente peligrosos no son tu nombre, sino tu <strong>ubicación, tus contactos y el acceso a tu cámara</strong>. Un acosador no necesita tu nombre real si sabe dónde estás."}, {"letter": "C", "text": "Antes de instalarla, investigas qué permisos necesita realmente. Activas solo los imprescindibles y configuras el perfil como privado.", "quality": "best", "points": 3, "feedback": "Excelente criterio. Investigas antes de actuar, configuras la privacidad desde el principio y no te dejas llevar por la presión del grupo.", "info_title": "Configurar antes de usar", "info": "<strong>Configura de forma adecuada la privacidad</strong> de tus redes sociales y apps ANTES de empezar a usarlas. Perfil privado, ubicación desactivada, contactos no sincronizados. <strong>Piensa antes de publicar</strong> sobre las consecuencias de compartir esa información."}]}, {"title": "El reto viral", "emoji": "🔥", "narrative": "Hay un <strong>reto viral</strong> en TikTok que consiste en grabar a un compañero/a en una situación ridícula sin que se entere y subirlo con un hashtag. Si no participas, te dicen que eres <em>\"aburrido/a\"</em>. Un amigo ya ha grabado el vídeo y te pide que <strong>lo subas tú desde tu cuenta</strong> para que no le pillen a él.", "choices": [{"letter": "A", "text": "Lo subes pero sin etiquetar a nadie y con la cara borrosa. Así no se identifica.", "quality": "bad", "points": 0, "feedback": "En un instituto pequeño, todo el mundo sabe quién es aunque esté borroso. Además, al subirlo desde tu cuenta tú eres el responsable legal del contenido, no tu amigo.", "info_title": "Responsabilidad digital", "info": "Quien <strong>publica el contenido es responsable</strong> de él, independientemente de quién lo grabó. Además, la cara borrosa no impide la identificación en un entorno pequeño como un instituto. <strong>No hagas en la Red lo que no harías en persona.</strong>"}, {"letter": "B", "text": "Le dices que no vas a subirlo y le aconsejas que lo borre. Si insiste, pasas de él.", "quality": "best", "points": 3, "feedback": "Te niegas con firmeza, le aconsejas lo correcto y no te dejas presionar. No necesitas dar explicaciones largas: un \"no\" claro es suficiente.", "info_title": "Comunicación asertiva", "info": "Decir que no a la presión del grupo es <strong>pensamiento crítico en acción</strong>. Comunica lo que piensas de forma <strong>asertiva</strong>: clara y honestamente. No necesitas ser borde: <strong>\"No me parece bien, no lo voy a hacer\"</strong> es una frase completa."}, {"letter": "C", "text": "No lo subes tú pero le dices \"súbelo tú si quieres, es tu problema\". No quieres meterte.", "quality": "ok", "points": 1, "feedback": "No participar es bueno, pero decirle que lo suba desde su cuenta es dar luz verde al acoso. No eres responsable directo, pero podrías haber intentado frenarlo.", "info_title": "La línea entre no participar y consentir", "info": "No participar activamente y <strong>dar permiso pasivo</strong> son cosas diferentes. Decir \"haz lo que quieras\" cuando sabes que va a dañar a alguien es una forma de <strong>complicidad</strong>. Tus amigos son tus <strong>mejores aliados para protegerte y proteger a otros</strong>."}]}, {"title": "El mensaje del desconocido", "emoji": "⚠️", "narrative": "Un chico/a mayor que no conoces te escribe por privado en Instagram. Es simpático/a, te halaga y te dice que te ha visto por el instituto. Después de unos días hablando, te pide que le <strong>envíes una foto tuya \"para conocerte mejor\"</strong>. Dice que es para un <em>\"grupo privado de gente guay\"</em>.", "choices": [{"letter": "A", "text": "Le mandas una selfie normal. No tiene nada de malo, no es una foto comprometida.", "quality": "bad", "points": 0, "feedback": "Una foto \"normal\" puede ser manipulada, usada para crear un perfil falso o para avanzar hacia peticiones cada vez más personales. Es una técnica clásica de grooming: empezar con poco para ir pidiendo más.", "info_title": "Las técnicas del grooming", "info": "El <strong>grooming</strong> sigue un patrón: contacto amable → generar confianza → pedir cosas pequeñas → escalar a contenido comprometido → <strong>sextorsión</strong> (chantajear con publicar las imágenes). Todo empieza con algo que parece inofensivo."}, {"letter": "B", "text": "Le preguntas a tus amigos si conocen a esa persona y buscas más información antes de decidir.", "quality": "ok", "points": 1, "feedback": "Investigar es mejor que actuar a ciegas, pero mientras indagas sigues manteniendo la conversación con alguien potencialmente peligroso. El paso clave que falta es contárselo a un adulto.", "info_title": "Verificar no es suficiente", "info": "Los perfiles falsos pueden parecer muy reales: <strong>fotos robadas, seguidores comprados, historias creíbles</strong>. Que tus amigos \"le conozcan\" no garantiza que sea quien dice ser. La regla de oro: <strong>nunca envíes fotos a desconocidos</strong>, por muy normal que parezca la petición."}, {"letter": "C", "text": "No envías nada, le bloqueas y se lo cuentas a tus padres o un adulto de confianza.", "quality": "best", "points": 3, "feedback": "Reacción perfecta. No arriesgas nada, cortas el contacto y avisas a un adulto que puede evaluar si hay peligro real. Esto no es exagerar: es protegerte.", "info_title": "Protégete siempre", "info": "<strong>No facilites datos personales ni imágenes a desconocidos</strong>, por muy amables que parezcan. Las imágenes y vídeos pueden ser utilizados para <strong>sextorsión</strong>: chantajearte amenazando con publicarlos. Si alguien te pide fotos o te hace sentir incómodo/a, <strong>bloquea y cuenta</strong>."}]}];
+
+let playerName = "";
+let epScore = 0;
+let scenarioScores = [];
+let currentScenario = 0;
+
+// ── INIT ──
+const nameInput = document.getElementById("nameInput");
+const btnGo = document.getElementById("btnGo");
+
+// Try to load from storage
+(function init() {
+  try {
+    const stored = localStorage.getItem("ciberacoso_name");
+    if (stored && EP_NUM > 1) {
+      nameInput.value = stored;
+      btnGo.disabled = false;
+    }
+  } catch(e) {}
+})();
+
+nameInput.addEventListener("input", () => {
+  btnGo.disabled = nameInput.value.trim().length < 2;
+});
+nameInput.addEventListener("keydown", e => {
+  if (e.key==="Enter" && !btnGo.disabled) startEpisode();
+});
+btnGo.addEventListener("click", startEpisode);
+
+function startEpisode() {
+  playerName = nameInput.value.trim();
+  try {
+    localStorage.setItem("ciberacoso_name", playerName);
+  } catch(e) {}
+  
+  document.getElementById("screenName").classList.remove("active");
+  document.getElementById("screenPlay").classList.add("active");
+  renderScenario(0);
+}
+
+// If name already stored and ep > 1, auto-start
+if (EP_NUM > 1) {
+  try {
+    const stored = localStorage.getItem("ciberacoso_name");
+    if (stored) {
+      nameInput.value = stored;
+      btnGo.disabled = false;
+    }
+  } catch(e) {}
+}
+
+function renderScenario(idx) {
+  const sc = scenarios[idx];
+  currentScenario = idx;
+  
+  const choicesHtml = sc.choices.map((c, ci) => `
+    <button class="choice-btn" onclick="selectChoice(${idx}, ${ci})">
+      <span class="choice-letter">${c.letter}</span>
+      <span>${c.text}</span>
+    </button>
+  `).join("");
+
+  document.getElementById("scenarioContainer").innerHTML = `
+    <div class="scenario">
+      <div class="sc-num">Situación ${idx+1} de 3</div>
+      <h2 class="sc-title">${sc.title}</h2>
+      <div class="narrative">
+        <span class="em">${sc.emoji}</span>
+        ${sc.narrative}
+      </div>
+      <div class="choices-label">¿Qué haces?</div>
+      <div class="choices" id="choices${idx}">${choicesHtml}</div>
+      <div class="feedback" id="feedback${idx}"></div>
+      <div class="info-box" id="info${idx}"></div>
+      <button class="btn-continue" id="btnCont${idx}" onclick="nextScenario(${idx})">
+        ${idx < 2 ? "Siguiente situación →" : "Ver resultado del episodio →"}
+      </button>
+    </div>
+  `;
+
+  document.getElementById("progFill").style.width = ((idx)/3*100) + "%";
+  document.getElementById("progLabel").textContent = `Situación ${idx+1} de 3`;
+  document.getElementById("progScore").textContent = epScore + " pts";
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+function selectChoice(scIdx, cIdx) {
+  const sc = scenarios[scIdx];
+  const c = sc.choices[cIdx];
+
+  const btns = document.querySelectorAll(`#choices${scIdx} .choice-btn`);
+  btns.forEach((btn, i) => {
+    if (i === cIdx) btn.classList.add("selected", c.quality);
+    else btn.classList.add("dimmed");
+  });
+
+  epScore += c.points;
+  scenarioScores.push({ title: sc.title, points: c.points });
+
+  const labels = { best:"✅ ¡Gran decisión!", ok:"🟡 Podría ser mejor", bad:"❌ Mala elección" };
+  const ptsText = c.points===3 ? "+3 pts" : c.points===1 ? "+1 pt" : "+0 pts";
+
+  const fb = document.getElementById(`feedback${scIdx}`);
+  fb.className = `feedback show ${c.quality}`;
+  fb.innerHTML = `
+    <div class="fb-head">
+      <span>${labels[c.quality]}</span>
+      <span class="pts-badge">${ptsText}</span>
+    </div>
+    <p>${c.feedback}</p>
+  `;
+
+  const info = document.getElementById(`info${scIdx}`);
+  info.className = "info-box show";
+  info.innerHTML = `
+    <div class="info-box-title">💡 ${c.info_title}</div>
+    <p>${c.info}</p>
+  `;
+
+  document.getElementById(`btnCont${scIdx}`).classList.add("show");
+  document.getElementById("progScore").textContent = epScore + " pts";
+}
+
+function nextScenario(fromIdx) {
+  if (fromIdx < 2) {
+    renderScenario(fromIdx + 1);
+  } else {
+    showEpEnd();
+  }
+}
+
+function showEpEnd() {
+  document.getElementById("scenarioContainer").style.display = "none";
+  const epEnd = document.getElementById("epEnd");
+  epEnd.style.display = "block";
+  
+  document.getElementById("progFill").style.width = "100%";
+  document.getElementById("progLabel").textContent = "Episodio 3 completado";
+
+  // Save score
+  try {
+    let allScores = JSON.parse(localStorage.getItem("ciberacoso_scores") || "[]");
+    // Replace or add this episode's data
+    allScores = allScores.filter(s => s.ep !== EP_NUM);
+    allScores.push({ ep: EP_NUM, score: epScore, scenarios: scenarioScores });
+    localStorage.setItem("ciberacoso_scores", JSON.stringify(allScores));
+  } catch(e) {}
+
+  // Calculate cumulative
+  let cumulative = epScore;
+  try {
+    const allScores = JSON.parse(localStorage.getItem("ciberacoso_scores") || "[]");
+    cumulative = allScores.reduce((sum, s) => sum + s.score, 0);
+  } catch(e) {}
+
+  document.getElementById("endMsg").textContent = 
+    `${playerName}, has obtenido ${epScore} de 9 puntos en este episodio.`;
+  document.getElementById("endScore").textContent = 
+    `Puntuación acumulada: ${cumulative} de ${EP_NUM * 9} pts`;
+
+  const nextBtn = document.getElementById("btnNextEp") || document.getElementById("btnFinal");
+  if (nextBtn) nextBtn.classList.add("show");
+  
+  window.scrollTo({ top: 0, behavior: "smooth" });
+}
+
+
+</script>
+</body>
+</html>
